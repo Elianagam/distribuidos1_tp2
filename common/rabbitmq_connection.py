@@ -26,6 +26,7 @@ class RabbitMQConnection:
                 exchange_type='fanout'
         )
         if bind:
+            # Si es exgange que recibe tiene que crear una anon queue 
             anon_queue = self.channel.queue_declare(queue='', exclusive=True)
             self.queue_name = anon_queue.method.queue
 

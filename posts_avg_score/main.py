@@ -3,7 +3,7 @@ import signal
 import os
 
 from configparser import ConfigParser
-from posts_sum_score import PostsSumScore
+from posts_avg_score import PostsAvgScore
 
 def initialize_log():
     """
@@ -42,7 +42,7 @@ def main():
 
         logging.info("Server configuration: {}".format(config_params))
 
-        recver = PostsSumScore(config_params["QUEUE_RECV"], config_params["QUEUE_SEND"])
+        recver = PostsAvgScore(config_params["QUEUE_RECV"], config_params["QUEUE_SEND"])
         recver.start()
     except (KeyboardInterrupt, SystemExit):
         logging.info(f"[MAIN_COMMENTS] Stop event is set")

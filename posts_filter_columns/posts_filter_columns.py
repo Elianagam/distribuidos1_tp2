@@ -5,10 +5,8 @@ from common.rabbitmq_connection import RabbitMQConnection
 
 class PostsFilterColumns:
     def __init__(self, queue_recv, queue_send):
-        self.queue_recv = queue_recv
-        self.queue_send = queue_send
-        self.conn_recv = RabbitMQConnection(self.queue_recv)
-        self.conn_send = RabbitMQConnection(self.queue_send)
+        self.conn_recv = RabbitMQConnection(queue_name=queue_recv)
+        self.conn_send = RabbitMQConnection(exchange_name=queue_send)
 
     def start(self):
         self.conn_recv.recv(self.__callback)
@@ -18,8 +16,6 @@ class PostsFilterColumns:
 
     def __callback(self, ch, method, properties, body):
         posts = json.loads(body)
-        if len(posts) == 0: pass
-
         result = self.__parser(posts)
         self.conn_send.send(json.dumps(result))
 
@@ -35,6 +31,7 @@ class PostsFilterColumns:
             }
             list_posts.append(post)
 
+        logging.info(f"[POST FILTER] {len(list_posts)}")
         return list_posts
 
     def __invalid_post(self, post):
