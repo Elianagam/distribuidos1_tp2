@@ -33,6 +33,6 @@ class PostsAvgScore:
         # publish avg
         avg = self.sum_score / self.count_posts
         logging.info(f"--- [POST_SCORE_AVG] {avg}")
-        self.conn_send.send({"posts_score_avg": avg})
+        self.conn_send.send(json.dumps({"posts_score_avg": avg}))
 
 

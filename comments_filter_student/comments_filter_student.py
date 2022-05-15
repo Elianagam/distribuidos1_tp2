@@ -13,7 +13,7 @@ class CommentsFilterStudent:
 
         result = self.__parser(comments)
         for r in result:
-            logging.info(f"[FILTER_STUDENT] {r['post_id']}")
+            logging.info(f"[FILTER_STUDENT] Id: {r['post_id']}")
 
         self.conn_send.send(json.dumps(result))
 
@@ -29,7 +29,7 @@ class CommentsFilterStudent:
                 cmt = {"post_id": c["post_id"]}
                 student_comments.append(cmt)
 
-        logging.info(f"[FILTER_STUDENT] {len(student_comments)}")
+        logging.info(f"[FILTER_STUDENT] Size: {len(student_comments)}")
         return student_comments
 
     def __filter_student(self, comment):
