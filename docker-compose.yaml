@@ -1,0 +1,51 @@
+version: '3'
+services:
+  rabbitmq:
+    build:
+      context: ./rabbitmq
+      dockerfile: Dockerfile
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+  client:
+    container_name: client
+    image: client:latest
+    entrypoint: python3 /main.py
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    links: 
+      - rabbitmq
+    environment:
+      - CHUNKSIZE=25
+      - FILE_COMMETS=comments.csv
+      - FILE_POSTS=posts.csv
+      - COMMETS_QUEUE=comments_queue 
+      - POSTS_QUEUE=posts_queue
+
+  comments_filter_body:
+    container_name: comments_filter_body
+    image: comments_filter_body:latest
+    entrypoint: python3 /main.py
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    links: 
+      - rabbitmq
+    environment:
+      - QUEUE_RECV=comments_queue
+      - QUEUE_SEND=comments_filter_queue
+
+  comments_filter_student:
+    container_name: comments_filter_student
+    image: comments_filter_student:latest
+    entrypoint: python3 /main.py
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    links: 
+      - rabbitmq
+    environment:
+      - QUEUE_RECV=comments_filter_queue
+      - QUEUE_SEND=student_ids_queue
