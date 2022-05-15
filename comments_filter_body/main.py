@@ -13,7 +13,7 @@ def initialize_log():
     """
     logging.basicConfig(
         format='%(asctime)s %(levelname)-8s %(message)s',
-        level='DEBUG',
+        level='INFO',
         datefmt='%Y-%m-%d %H:%M:%S',
     )
 
@@ -27,7 +27,6 @@ def initialize_config():
     try:
         config_params["QUEUE_RECV"] = config["DEFAULT"]['QUEUE_RECV']
         config_params["QUEUE_SEND"] = config["DEFAULT"]['QUEUE_SEND']
-        config_params["logging_level"] = config["DEFAULT"]['logging_level']
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:

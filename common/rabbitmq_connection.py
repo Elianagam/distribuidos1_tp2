@@ -6,6 +6,7 @@ import json
 
 class RabbitMQConnection:
     def __init__(self, queue_name='', exchange_name='', bind=False):
+        time.sleep(10)
         self.connection = pika.BlockingConnection(
             pika.ConnectionParameters('rabbitmq')
         ) #rabbitmq/localhost
@@ -25,7 +26,7 @@ class RabbitMQConnection:
                 exchange_type='fanout'
         )
         if bind:
-            anon_queue = channel.queue_declare(queue='', exclusive=True)
+            anon_queue = self.channel.queue_declare(queue='', exclusive=True)
             self.queue_name = anon_queue.method.queue
 
             self.channel.queue_bind(
@@ -35,7 +36,7 @@ class RabbitMQConnection:
 
     def send(self, body):
         self.channel.basic_publish(
-            exchange=self.exchange,
+            exchange=self.exchange_name,
             routing_key=self.queue_name,
             body=body,
             #properties=pika.BasicProperties(delivery_mode=2)  #  message persistent

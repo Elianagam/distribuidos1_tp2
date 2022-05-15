@@ -34,8 +34,10 @@ class CommentsFilterBody:
                 "body": c["body"],
                 "sentiment": c["sentiment"],
             }
+            logging.info(f"[FILTER_BODY] {cmt}")
             filter_comments.append(cmt)
 
+        logging.info(f"[FILTER_BODY] {len(filter_comments)}")
         return filter_comments
 
     def __invalid_body(self, comment):
@@ -43,5 +45,5 @@ class CommentsFilterBody:
         return len(comment["body"]) == 0 or comment["body"] == "[removed]"
 
     def __get_post_id(self, comment):
-        rgx = r'https://old.reddit.com/r/meirl/comments/([^/]+)/meirl/.*'
-        return re.findall(rgx, comment["permalink"])
+        rgx = r'https://old.reddit.com/r/meirl/comments/([^/]+)/me.*'
+        return re.findall(rgx, comment["permalink"])[0]
