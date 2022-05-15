@@ -14,8 +14,6 @@ class CommentsFilterBody:
     def __callback(self, ch, method, properties, body):
         comments = json.loads(body)
         
-        if len(comments) == 0: pass
-            # TODO SOMETHING??
         result = self.__parser(comments)
         self.conn_send.send(json.dumps(result))
 
@@ -34,7 +32,6 @@ class CommentsFilterBody:
                 "body": c["body"],
                 "sentiment": c["sentiment"],
             }
-            logging.info(f"[FILTER_BODY] {cmt}")
             filter_comments.append(cmt)
 
         logging.info(f"[FILTER_BODY] {len(filter_comments)}")

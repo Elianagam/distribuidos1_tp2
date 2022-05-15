@@ -49,3 +49,16 @@ services:
     environment:
       - QUEUE_RECV=comments_filter_queue
       - QUEUE_SEND=student_ids_queue
+
+  posts_filter_columns:
+    container_name: posts_filter_columns
+    image: posts_filter_columns:latest
+    entrypoint: python3 /main.py
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    links: 
+      - rabbitmq
+    environment:
+      - QUEUE_RECV=posts_queue
+      - QUEUE_SEND=posts_filter_queue

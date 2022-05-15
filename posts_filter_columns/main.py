@@ -40,7 +40,7 @@ def main():
         config_params = initialize_config()
         initialize_log()
 
-        logging.debug("Server configuration: {}".format(config_params))
+        logging.info("Server configuration: {}".format(config_params))
 
         recver = PostsFilterColumns(config_params["QUEUE_RECV"], config_params["QUEUE_SEND"])
         recver.start()

@@ -5,19 +5,20 @@ from common.rabbitmq_connection import RabbitMQConnection
 
 class PostsSumScore:
     def __init__(self, queue_recv, queue_send):
-        self.queue_recv = queue_recv
-        self.queue_send = queue_send
-        self.conn_recv = RabbitMQConnection(self.queue_recv)
-        self.conn_send = RabbitMQConnection(self.queue_send)
+        self.conn_recv = RabbitMQConnection(exchange_name=queue_recv, bind=True)
+        self.conn_send = RabbitMQConnection(queue_name=queue_send)
 
     def __callback(self, ch, method, properties, body):
         posts = json.loads(body)
 
         if len(posts) == 0:
-            pass
+            # when client finish, have send all
+            # send signal finish
+            self.conn_send.send(json.dumps({"end": True}))
 
-        post_score = self.__parser(posts)
-        self.conn_send.send(json.dumps(post_score))
+        else:
+            post_score = self.__parser(posts)
+            self.conn_send.send(json.dumps(post_score))
 
     def start(self):
         self.conn_recv.recv(self.__callback)
@@ -26,11 +27,11 @@ class PostsSumScore:
         self.conn_send.close()
 
     def __parser(self, posts):
-        score_sum = 0
-        total = 0
+        sum_score = 0
+        count_posts = 0
         for p in posts:
-            score_sum += p["score"]
-            total += 1
+            sum_score += p["score"]
+            count_posts += 1
 
-        p_score = {"score_sum": score_sum, "n_post": total}
+        p_score = {"sum_score": sum_score, "n_post": count_posts}
         return p_score

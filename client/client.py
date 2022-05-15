@@ -15,14 +15,14 @@ class Client:
 
     def start(self):
         comments_sender = Process(target=self.__send_comments())
-        #posts_sender = Process(target=self.__send_posts())
+        posts_sender = Process(target=self.__send_posts())
 
         comments_sender.start()
         comments_sender.join()
 
-        #posts_sender.start()
-        #posts_sender.join()
-        logging.info(f"Client started...")
+        posts_sender.start()
+        posts_sender.join()
+        logging.info(f"[CLIENT] started...")
 
     def __send_comments(self):
         fields = ["type","id", "subreddit.id", "subreddit.name",
