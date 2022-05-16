@@ -14,6 +14,7 @@ class PostsAvgSentiment:
         if "end" in posts:
             self.conn_send.send(json.dumps(posts))
             return
+
         result = self.__parser(posts)
         self.conn_send.send(json.dumps(result))
 
@@ -31,7 +32,6 @@ class PostsAvgSentiment:
                 "post_id": p["post_id"],
                 "avg_sentiment": post_stm_avg
             }
-            logging.info(f"[SENTIMENT_AVG] {p_stm}")
             list_posts.append(p_stm)
 
         return list_posts

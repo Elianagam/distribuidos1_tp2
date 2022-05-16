@@ -15,7 +15,6 @@ class CommentsFilterWithSentiment:
         comments = json.loads(body)
 
         if "end" in comments:
-            logging.info(f"[FILTER SENTIMENT] END")
             self.conn_send.send(json.dumps(comments))
             return
 
