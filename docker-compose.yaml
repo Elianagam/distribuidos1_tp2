@@ -50,6 +50,32 @@ services:
       - QUEUE_RECV=comments_filter_queue
       - QUEUE_SEND=student_ids_queue
 
+  comments_groupby_postid:
+    container_name: comments_groupby_postid
+    image: comments_groupby_postid:latest
+    entrypoint: python3 /main.py
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    links: 
+      - rabbitmq
+    environment:
+      - QUEUE_RECV=comments_filter_queue
+      - QUEUE_SEND=comments_groupby_queue
+
+  posts_avg_sentiment:
+    container_name: posts_avg_sentiment
+    image: posts_avg_sentiment:latest
+    entrypoint: python3 /main.py
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    links: 
+      - rabbitmq
+    environment:
+      - QUEUE_RECV=comments_groupby_queue
+      - QUEUE_SEND=post_sentiments_queue
+
   posts_filter_columns:
     container_name: posts_filter_columns
     image: posts_filter_columns:latest

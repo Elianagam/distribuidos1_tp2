@@ -16,6 +16,11 @@ class PostsFilterColumns:
 
     def __callback(self, ch, method, properties, body):
         posts = json.loads(body)
+
+        if len(posts) == 0:
+            self.conn_send.send(json.dumps({"end": True}))
+            return
+        
         result = self.__parser(posts)
         self.conn_send.send(json.dumps(result))
 

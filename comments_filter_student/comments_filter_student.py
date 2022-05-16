@@ -11,9 +11,13 @@ class CommentsFilterStudent:
     def __callback(self, ch, method, properties, body):
         comments = json.loads(body)
 
+        if "end" in comments:
+            self.conn_send.send(json.dumps(comments))
+            return
+        
         result = self.__parser(comments)
-        for r in result:
-            logging.info(f"[FILTER_STUDENT] Id: {r['post_id']}")
+        #for r in result:
+        #    logging.info(f"[FILTER_STUDENT] Id: {r['post_id']}")
 
         self.conn_send.send(json.dumps(result))
 

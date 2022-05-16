@@ -3,7 +3,7 @@ import signal
 import os
 
 from configparser import ConfigParser
-from client import Client
+from posts_filter_score_gte_avg import PostsFilterScoreGteAvg
 
 def initialize_log():
     """
@@ -25,11 +25,8 @@ def initialize_config():
 
     config_params = {}
     try:
-        config_params["FILE_COMMETS"] = config['FILE_COMMETS']
-        config_params["FILE_POSTS"] = config['FILE_POSTS']
-        config_params["CHUNKSIZE"] = int(config['CHUNKSIZE'])
-        config_params["POSTS_QUEUE"] = config['POSTS_QUEUE']
-        config_params["COMMETS_QUEUE"] = config['COMMETS_QUEUE']
+        config_params["QUEUE_RECV"] = config['QUEUE_RECV']
+        config_params["QUEUE_SEND"] = config['QUEUE_SEND']
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -43,20 +40,12 @@ def main():
         config_params = initialize_config()
         initialize_log()
 
-        logging.debug("Client configuration: {}".format(config_params))
+        logging.info("Server configuration: {}".format(config_params))
 
-        file_comments = "comments.csv"
-        file_posts = "post.csv"
-        client = Client(
-            config_params["COMMETS_QUEUE"],
-            config_params["POSTS_QUEUE"],
-            config_params["FILE_COMMETS"],
-            config_params["FILE_POSTS"],
-            config_params["CHUNKSIZE"]
-        )
-        client.start()
+        recver = PostsFilterScoreGteAvg(config_params["QUEUE_RECV"], config_params["QUEUE_SEND"])
+        recver.start()
     except (KeyboardInterrupt, SystemExit):
-        logging.info(f"[MAIN_CLIENT] Stop event is set")
+        logging.info(f"[MAIN_COMMENTS] Stop event is set")
 
 
 if __name__ == "__main__":

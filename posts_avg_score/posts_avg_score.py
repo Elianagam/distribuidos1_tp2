@@ -14,9 +14,11 @@ class PostsAvgScore:
         post_score = json.loads(body)
 
         if "end" in post_score:
-            self.__calculate_avg()
-        else:
-            self.__sum_score(post_score)
+            avg = self.__calculate_avg()
+            self.conn_send.send(json.dumps({"posts_score_avg": avg}))
+            return
+
+        self.__sum_score(post_score)
 
     def start(self):
         self.conn_recv.recv(self.__callback)
@@ -32,7 +34,5 @@ class PostsAvgScore:
         # when client finish, have send all
         # publish avg
         avg = self.sum_score / self.count_posts
+        
         logging.info(f"--- [POST_SCORE_AVG] {avg}")
-        self.conn_send.send(json.dumps({"posts_score_avg": avg}))
-
-

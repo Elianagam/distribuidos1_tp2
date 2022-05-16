@@ -25,8 +25,8 @@ def initialize_config():
 
     config_params = {}
     try:
-        config_params["QUEUE_RECV"] = config["DEFAULT"]['QUEUE_RECV']
-        config_params["QUEUE_SEND"] = config["DEFAULT"]['QUEUE_SEND']
+        config_params["QUEUE_RECV"] = config['QUEUE_RECV']
+        config_params["QUEUE_SEND"] = config['QUEUE_SEND']
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
