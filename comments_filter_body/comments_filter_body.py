@@ -31,6 +31,7 @@ class CommentsFilterBody:
         for c in comments:
             if self.__invalid_body(c): continue
 
+            #stm = c["sentiment"] if c["sentiment"] != '' else 0
             cmt = {
                 "post_id": self.__get_post_id(c),
                 "body": c["body"],

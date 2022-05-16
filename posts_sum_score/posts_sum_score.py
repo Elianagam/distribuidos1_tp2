@@ -30,7 +30,7 @@ class PostsSumScore:
         sum_score = 0
         count_posts = 0
         for p in posts:
-            sum_score += int(p["score"])
+            sum_score += p["score"]
             count_posts += 1
 
         p_score = {"sum_score": sum_score, "n_post": count_posts}

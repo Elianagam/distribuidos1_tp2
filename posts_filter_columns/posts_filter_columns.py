@@ -32,7 +32,7 @@ class PostsFilterColumns:
             post = {
                 "id": p["id"],
                 "url": p["url"],
-                "score": p["score"]
+                "score": float(p["score"])
             }
             list_posts.append(post)
 

@@ -5,7 +5,7 @@ from common.rabbitmq_connection import RabbitMQConnection
 
 class CommentsGroupbyPostId:
     def __init__(self, queue_recv, queue_send, chunksize=10):
-        self.conn_recv = RabbitMQConnection(exchange_name=queue_recv, bind=True)
+        self.conn_recv = RabbitMQConnection(queue_name=queue_recv)
         self.conn_send = RabbitMQConnection(queue_name=queue_send)
         self.chunksize = chunksize
         self.cmts_group_pid = {}
