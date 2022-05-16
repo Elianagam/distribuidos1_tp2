@@ -14,7 +14,6 @@ class PostsAvgSentiment:
         if "end" in posts:
             self.conn_send.send(json.dumps(posts))
             return
-
         result = self.__parser(posts)
         self.conn_send.send(json.dumps(result))
 
@@ -27,7 +26,7 @@ class PostsAvgSentiment:
     def __parser(self, posts):
         list_posts = []
         for p in posts:
-            post_stm_avg = round(mean(p["sentiments"]), 4) 
+            post_stm_avg = sum(p["sentiments"]) / len(p["sentiments"]) 
             p_stm = {
                 "post_id": p["post_id"],
                 "avg_sentiment": post_stm_avg

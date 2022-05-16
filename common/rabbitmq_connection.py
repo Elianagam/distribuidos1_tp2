@@ -6,7 +6,7 @@ import json
 
 class RabbitMQConnection:
     def __init__(self, queue_name='', exchange_name='', bind=False):
-        time.sleep(10)
+        time.sleep(15)
         self.connection = pika.BlockingConnection(
             pika.ConnectionParameters('rabbitmq')
         ) #rabbitmq/localhost

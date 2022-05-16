@@ -62,6 +62,7 @@ services:
     environment:
       - QUEUE_RECV=comments_filter_queue
       - QUEUE_SEND=comments_groupby_queue
+      - CHUNKSIZE=5
 
   posts_avg_sentiment:
     container_name: posts_avg_sentiment

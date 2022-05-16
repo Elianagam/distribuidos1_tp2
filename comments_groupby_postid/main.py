@@ -43,14 +43,12 @@ def main():
 
         logging.debug("Client configuration: {}".format(config_params))
 
-        file_comments = "comments.csv"
-        file_posts = "post.csv"
-        client = Client(
+        recver = CommentsGroupbyPostId(
             config_params["QUEUE_RECV"],
             config_params["QUEUE_SEND"],
             config_params["CHUNKSIZE"]
         )
-        client.start()
+        recver.start()
     except (KeyboardInterrupt, SystemExit):
         logging.info(f"[MAIN_CLIENT] Stop event is set")
 

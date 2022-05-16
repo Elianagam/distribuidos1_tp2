@@ -45,8 +45,6 @@ def main():
 
         logging.debug("Client configuration: {}".format(config_params))
 
-        file_comments = "comments.csv"
-        file_posts = "post.csv"
         client = Client(
             config_params["COMMETS_QUEUE"],
             config_params["POSTS_QUEUE"],

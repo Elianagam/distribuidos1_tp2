@@ -11,10 +11,10 @@ class PostsSumScore:
     def __callback(self, ch, method, properties, body):
         posts = json.loads(body)
 
-        if "end" in post:
+        if "end" in posts:
             # when client finish, have send all
             # send signal finish
-            self.conn_send.send(json.dumps(post))
+            self.conn_send.send(json.dumps(posts))
             return
 
         post_score = self.__parser(posts)
