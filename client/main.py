@@ -25,11 +25,11 @@ def initialize_config():
 
     config_params = {}
     try:
-        config_params["FILE_COMMETS"] = config['FILE_COMMETS']
-        config_params["FILE_POSTS"] = config['FILE_POSTS']
-        config_params["CHUNKSIZE"] = int(config['CHUNKSIZE'])
-        config_params["POSTS_QUEUE"] = config['POSTS_QUEUE']
-        config_params["COMMETS_QUEUE"] = config['COMMETS_QUEUE']
+        config_params["FILE_COMMETS"] = config["DEFAULT"]['FILE_COMMETS']
+        config_params["FILE_POSTS"] = config["DEFAULT"]['FILE_POSTS']
+        config_params["CHUNKSIZE"] = int(config["DEFAULT"]['CHUNKSIZE'])
+        config_params["POSTS_QUEUE"] = config["DEFAULT"]['POSTS_QUEUE']
+        config_params["COMMETS_QUEUE"] = config["DEFAULT"]['COMMETS_QUEUE']
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
