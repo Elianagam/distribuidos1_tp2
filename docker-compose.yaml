@@ -76,6 +76,19 @@ services:
       - QUEUE_RECV=comments_groupby_queue
       - QUEUE_SEND=post_sentiments_queue
 
+  posts_max_avg_sentiment:
+    container_name: posts_max_avg_sentiment
+    image: posts_max_avg_sentiment:latest
+    entrypoint: python3 /main.py
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    links: 
+      - rabbitmq
+    environment:
+      - QUEUE_RECV=post_sentiments_queue
+      - QUEUE_SEND=post_avg_sentiments_queue
+
   posts_filter_columns:
     container_name: posts_filter_columns
     image: posts_filter_columns:latest

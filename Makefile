@@ -12,8 +12,9 @@ docker-image:
 	docker build -f ./posts_filter_columns/Dockerfile -t "posts_filter_columns:latest" .
 	docker build -f ./posts_sum_score/Dockerfile -t "posts_sum_score:latest" .
 	docker build -f ./posts_avg_score/Dockerfile -t "posts_avg_score:latest" .
-	#docker build -f ./comments_groupby_postid/Dockerfile -t "comments_groupby_postid:latest" .
-	#docker build -f ./posts_avg_sentiment/Dockerfile -t "posts_avg_sentiment:latest" .
+	docker build -f ./comments_groupby_postid/Dockerfile -t "comments_groupby_postid:latest" .
+	docker build -f ./posts_avg_sentiment/Dockerfile -t "posts_avg_sentiment:latest" .
+	docker build -f ./posts_max_avg_sentiment/Dockerfile -t "posts_max_avg_sentiment:latest" .
 .PHONY: docker-image
 
 docker-compose-up:
