@@ -3,7 +3,7 @@ import signal
 import os
 
 from configparser import ConfigParser
-from comments_filter_with_sentiment import CommentsFilterWithSentiment
+from comments_filter_columns import CommentsFilterColumns
 
 def initialize_log():
     """
@@ -42,10 +42,12 @@ def main():
 
         logging.info("Server configuration: {}".format(config_params))
 
-        recver = CommentsFilterWithSentiment(config_params["QUEUE_RECV"], config_params["QUEUE_SEND"])
+        recver = CommentsFilterColumns(config_params["QUEUE_RECV"], config_params["QUEUE_SEND"])
         recver.start()
     except (KeyboardInterrupt, SystemExit):
         logging.info(f"[MAIN_COMMENTS] Stop event is set")
+    except Exception as e:
+        logging.error(f"[FILTER COMMENTS] ERROR {e}")
 
 
 if __name__ == "__main__":

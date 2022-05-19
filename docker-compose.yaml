@@ -24,9 +24,9 @@ services:
       - COMMETS_QUEUE=comments_queue 
       - POSTS_QUEUE=posts_queue
 
-  comments_filter_body:
-    container_name: comments_filter_body
-    image: comments_filter_body:latest
+  comments_filter_columns:
+    container_name: comments_filter_columns
+    image: comments_filter_columns:latest
     entrypoint: python3 /main.py
     restart: on-failure
     depends_on:
@@ -47,35 +47,8 @@ services:
     links: 
       - rabbitmq
     environment:
-      - QUEUE_RECV=comments_filter_queue
+      - QUEUE_RECV=cmt_pst_join_queue
       - QUEUE_SEND=student_ids_queue
-
-  comments_filter_with_sentiment:
-    container_name: comments_filter_with_sentiment
-    image: comments_filter_with_sentiment:latest
-    entrypoint: python3 /main.py
-    restart: on-failure
-    depends_on:
-      - rabbitmq
-    links: 
-      - rabbitmq
-    environment:
-      - QUEUE_RECV=comments_filter_queue
-      - QUEUE_SEND=comments_filter_w_sentiment_queue
-
-  comments_groupby_postid:
-    container_name: comments_groupby_postid
-    image: comments_groupby_postid:latest
-    entrypoint: python3 /main.py
-    restart: on-failure
-    depends_on:
-      - rabbitmq
-    links: 
-      - rabbitmq
-    environment:
-      - QUEUE_RECV=comments_filter_w_sentiment_queue
-      - QUEUE_SEND=comments_groupby_queue
-      - CHUNKSIZE=5
 
   posts_avg_sentiment:
     container_name: posts_avg_sentiment
@@ -87,7 +60,7 @@ services:
     links: 
       - rabbitmq
     environment:
-      - QUEUE_RECV=comments_groupby_queue
+      - QUEUE_RECV=cmt_pst_join_queue
       - QUEUE_SEND=post_sentiments_queue
 
   posts_max_avg_sentiment:
@@ -114,20 +87,8 @@ services:
       - rabbitmq
     environment:
       - QUEUE_RECV=posts_queue
-      - QUEUE_SEND=posts_filter_queue
-
-  posts_sum_score:
-    container_name: posts_sum_score
-    image: posts_sum_score:latest
-    entrypoint: python3 /main.py
-    restart: on-failure
-    depends_on:
-      - rabbitmq
-    links: 
-      - rabbitmq
-    environment:
-      - QUEUE_RECV=posts_filter_queue
-      - QUEUE_SEND=posts_score_queue
+      - QUEUE_SEND_JOIN=posts_for_join_queue
+      - QUEUE_SEND_AVG=posts_for_avg_queue
 
   posts_avg_score:
     container_name: posts_avg_score
@@ -139,5 +100,20 @@ services:
     links: 
       - rabbitmq
     environment:
-      - QUEUE_RECV=posts_score_queue
-      - QUEUE_SEND=posts_avg_queue
+      - QUEUE_RECV=posts_for_avg_queue
+      - QUEUE_SEND=posts_avg_score_queue
+
+  join_comments_with_posts:
+    container_name: join_comments_with_posts
+    image: join_comments_with_posts:latest
+    entrypoint: python3 /main.py
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    links: 
+      - rabbitmq
+    environment:
+      - QUEUE_RECV_COMMENTS=comments_filter_queue
+      - QUEUE_RECV_POSTS=posts_for_join_queue
+      - QUEUE_SEND=cmt_pst_join_queue
+      - CHUNKSIZE=15

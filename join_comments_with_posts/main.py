@@ -3,7 +3,7 @@ import signal
 import os
 
 from configparser import ConfigParser
-from comments_filter_body import CommentsFilterBody
+from join_comments_with_posts import JoinCommentsWithPosts
 
 def initialize_log():
     """
@@ -25,8 +25,10 @@ def initialize_config():
 
     config_params = {}
     try:
-        config_params["QUEUE_RECV"] = config["DEFAULT"]['QUEUE_RECV']
+        config_params["QUEUE_RECV_COMMENTS"] = config["DEFAULT"]['QUEUE_RECV_COMMENTS']
+        config_params["QUEUE_RECV_POSTS"] = config["DEFAULT"]['QUEUE_RECV_POSTS']
         config_params["QUEUE_SEND"] = config["DEFAULT"]['QUEUE_SEND']
+        config_params["CHUNKSIZE"] = int(config["DEFAULT"]['CHUNKSIZE'])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -42,7 +44,12 @@ def main():
 
         logging.info("Server configuration: {}".format(config_params))
 
-        recver = CommentsFilterBody(config_params["QUEUE_RECV"], config_params["QUEUE_SEND"])
+        recver = JoinCommentsWithPosts(
+            queue_recv_comments=config_params["QUEUE_RECV_COMMENTS"],
+            queue_recv_post=config_params["QUEUE_RECV_POSTS"],
+            queue_send=config_params["QUEUE_SEND"],
+            chunksize=config_params["CHUNKSIZE"]
+            )
         recver.start()
     except (KeyboardInterrupt, SystemExit):
         logging.info(f"[MAIN_COMMENTS] Stop event is set")

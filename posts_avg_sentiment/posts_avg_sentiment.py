@@ -5,7 +5,7 @@ from common.rabbitmq_connection import RabbitMQConnection
 
 class PostsAvgSentiment:
     def __init__(self, queue_recv, queue_send):
-        self.conn_recv = RabbitMQConnection(queue_name=queue_recv)
+        self.conn_recv = RabbitMQConnection(exchange_name=queue_recv, bind=True)
         self.conn_send = RabbitMQConnection(queue_name=queue_send)
 
     def __callback(self, ch, method, properties, body):
@@ -27,11 +27,13 @@ class PostsAvgSentiment:
     def __parser(self, posts):
         list_posts = []
         for p in posts:
-            post_stm_avg = sum(p["sentiments"]) / len(p["sentiments"]) 
+            sentiments = [float(v) for v in p["sentiments"] if v != '']
+            if len(sentiments) == 0: continue
+            post_stm_avg = sum(sentiments) / len(sentiments)
             p_stm = {
-                "post_id": p["post_id"],
+                "url": p["url"],
                 "avg_sentiment": post_stm_avg
             }
             list_posts.append(p_stm)
-
         return list_posts
+

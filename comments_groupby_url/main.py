@@ -3,7 +3,7 @@ import signal
 import os
 
 from configparser import ConfigParser
-from posts_sum_score import PostsSumScore
+from comments_groupby_url import CommentsGroupbyUrl
 
 def initialize_log():
     """
@@ -25,6 +25,7 @@ def initialize_config():
 
     config_params = {}
     try:
+        config_params["CHUNKSIZE"] = int(config["DEFAULT"]['CHUNKSIZE'])
         config_params["QUEUE_RECV"] = config["DEFAULT"]['QUEUE_RECV']
         config_params["QUEUE_SEND"] = config["DEFAULT"]['QUEUE_SEND']
     except KeyError as e:
@@ -40,12 +41,16 @@ def main():
         config_params = initialize_config()
         initialize_log()
 
-        logging.info("Server configuration: {}".format(config_params))
+        logging.debug("Client configuration: {}".format(config_params))
 
-        recver = PostsSumScore(config_params["QUEUE_RECV"], config_params["QUEUE_SEND"])
+        recver = CommentsGroupbyUrl(
+            config_params["QUEUE_RECV"],
+            config_params["QUEUE_SEND"],
+            config_params["CHUNKSIZE"]
+        )
         recver.start()
     except (KeyboardInterrupt, SystemExit):
-        logging.info(f"[MAIN_COMMENTS] Stop event is set")
+        logging.info(f"[MAIN_CLIENT] Stop event is set")
 
 
 if __name__ == "__main__":

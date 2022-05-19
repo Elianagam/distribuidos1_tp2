@@ -7,18 +7,16 @@ all:
 
 docker-image:
 	docker build -f ./client/Dockerfile -t "client:latest" .
-	docker build -f ./comments_filter_body/Dockerfile -t "comments_filter_body:latest" .
+	docker build -f ./comments_filter_columns/Dockerfile -t "comments_filter_columns:latest" .
 	docker build -f ./comments_filter_student/Dockerfile -t "comments_filter_student:latest" .
 
-	docker build -f ./comments_filter_with_sentiment/Dockerfile -t "comments_filter_with_sentiment:latest" .
-	docker build -f ./comments_groupby_postid/Dockerfile -t "comments_groupby_postid:latest" .
+	#docker build -f ./comments_groupby_url/Dockerfile -t "comments_groupby_url:latest" .
 	docker build -f ./posts_avg_sentiment/Dockerfile -t "posts_avg_sentiment:latest" .
 	docker build -f ./posts_max_avg_sentiment/Dockerfile -t "posts_max_avg_sentiment:latest" .
 
 	docker build -f ./posts_filter_columns/Dockerfile -t "posts_filter_columns:latest" .
-	docker build -f ./posts_sum_score/Dockerfile -t "posts_sum_score:latest" .
 	docker build -f ./posts_avg_score/Dockerfile -t "posts_avg_score:latest" .
-		comments_filter_with_sentiment
+	docker build -f ./join_comments_with_posts/Dockerfile -t "join_comments_with_posts:latest" .
 .PHONY: docker-image
 
 docker-compose-up:

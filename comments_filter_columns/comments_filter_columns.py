@@ -4,11 +4,10 @@ import json
 import re 
 from common.rabbitmq_connection import RabbitMQConnection
 
-class CommentsFilterBody:
+class CommentsFilterColumns:
     def __init__(self, queue_recv, queue_send):
         self.conn_recv = RabbitMQConnection(queue_name=queue_recv)
-
-        self.conn_send = RabbitMQConnection(exchange_name=queue_send)
+        self.conn_send = RabbitMQConnection(queue_name=queue_send)
 
 
     def __callback(self, ch, method, properties, body):
@@ -30,8 +29,6 @@ class CommentsFilterBody:
         filter_comments = []
         for c in comments:
             if self.__invalid_body(c): continue
-
-            #stm = c["sentiment"] if c["sentiment"] != '' else 0
             cmt = {
                 "post_id": self.__get_post_id(c),
                 "body": c["body"],
@@ -39,7 +36,7 @@ class CommentsFilterBody:
             }
             filter_comments.append(cmt)
 
-        logging.info(f"[FILTER_BODY] {len(filter_comments)}")
+        logging.info(f"[COMMENTS FILTER] {len(filter_comments)}")
         return filter_comments
 
     def __invalid_body(self, comment):

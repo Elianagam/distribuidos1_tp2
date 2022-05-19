@@ -16,9 +16,6 @@ class CommentsFilterStudent:
             return
         
         result = self.__parser(comments)
-        #for r in result:
-        #    logging.info(f"[FILTER_STUDENT] Id: {r['post_id']}")
-
         self.conn_send.send(json.dumps(result))
 
     def start(self):
@@ -29,8 +26,14 @@ class CommentsFilterStudent:
     def __parser(self, comments):
         student_comments = []
         for c in comments:
+            #logging.info(f" [FILTER STUDENT] {c}")
+
             if self.__filter_student(c):
-                cmt = {"post_id": c["post_id"]}
+                logging.info(f" --------- [FILTER STUDENT] {c} ----------")
+                cmt = {
+                    "url": c["url"],
+                    "score": c["score"]
+                }
                 student_comments.append(cmt)
 
         logging.info(f"[FILTER_STUDENT] Size: {len(student_comments)}")
@@ -38,5 +41,5 @@ class CommentsFilterStudent:
 
     def __filter_student(self, comment):
         st = ["university", "college", "student", "teacher", "professor"]
-
-        return any(word.lower() in comment["body"] for word in st)
+        body =  " ".join(comment["body"])
+        return any(word.lower() in body for word in st)

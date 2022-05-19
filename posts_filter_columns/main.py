@@ -26,7 +26,8 @@ def initialize_config():
     config_params = {}
     try:
         config_params["QUEUE_RECV"] = config["DEFAULT"]['QUEUE_RECV']
-        config_params["QUEUE_SEND"] = config["DEFAULT"]['QUEUE_SEND']
+        config_params["QUEUE_SEND_JOIN"] = config["DEFAULT"]['QUEUE_SEND_JOIN']
+        config_params["QUEUE_SEND_AVG"] = config["DEFAULT"]['QUEUE_SEND_AVG']
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -42,7 +43,11 @@ def main():
 
         logging.info("Server configuration: {}".format(config_params))
 
-        recver = PostsFilterColumns(config_params["QUEUE_RECV"], config_params["QUEUE_SEND"])
+        recver = PostsFilterColumns(
+            queue_recv=config_params["QUEUE_RECV"],
+            queue_send_to_join=config_params["QUEUE_SEND_JOIN"],
+            queue_send_to_avg=config_params["QUEUE_SEND_AVG"]
+            )
         recver.start()
     except (KeyboardInterrupt, SystemExit):
         logging.info(f"[MAIN_COMMENTS] Stop event is set")
