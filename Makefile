@@ -5,8 +5,11 @@ default: build
 
 all:
 
-docker-image:
+docker-client-image:
 	docker build -f ./client/Dockerfile -t "client:latest" .
+.PHONY: docker-client-image
+
+docker-image:
 	docker build -f ./comments_filter_columns/Dockerfile -t "comments_filter_columns:latest" .
 	docker build -f ./comments_filter_student/Dockerfile -t "comments_filter_student:latest" .
 	docker build -f ./posts_filter_score_gte_avg/Dockerfile -t "posts_filter_score_gte_avg:latest" .

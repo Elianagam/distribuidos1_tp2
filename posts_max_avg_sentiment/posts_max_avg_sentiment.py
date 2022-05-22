@@ -56,7 +56,7 @@ class PostsMaxAvgSentiment:
             with open(filename,'wb') as f:
                 shutil.copyfileobj(r.raw, f)
                 
-            print(f"[DOWNLOAD_IMAGE] Success {filename}")
+            logging.info(f"[DOWNLOAD_IMAGE] Success {filename}")
             return {"image_bytes": r.raw}
         else:
             logging.error(f"[DOWNLOAD_IMAGE] Fail")
