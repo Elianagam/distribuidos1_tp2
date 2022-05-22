@@ -44,7 +44,10 @@ def main():
         initialize_log()
 
         logging.debug("Client configuration: {}".format(config_params))
-
+        try:
+            print(os.listdir("data"))
+        except:
+            pass
         client = Client(
             config_params["COMMETS_QUEUE"],
             config_params["POSTS_QUEUE"],

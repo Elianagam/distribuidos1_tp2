@@ -40,7 +40,7 @@ class CommentsFilterColumns:
             }
             filter_comments.append(cmt)
 
-        logging.info(f"[COMMENTS FILTER] {len(filter_comments)}")
+        #logging.info(f"[COMMENTS FILTER] {len(filter_comments)}")
         return filter_comments
 
     def __invalid_body(self, comment):

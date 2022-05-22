@@ -48,7 +48,7 @@ class PostsMaxAvgSentiment:
         import shutil
 
         image_url = self.max_avg["url"]
-        filename = "max_avgs_sentiment_url.jpg"
+        filename = "data/max_avgs_sentiment_url.jpg"
 
         r = requests.get(image_url, stream = True)
         if r.status_code == 200:

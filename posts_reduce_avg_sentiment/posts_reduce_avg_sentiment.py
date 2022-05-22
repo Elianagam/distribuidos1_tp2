@@ -30,7 +30,7 @@ class PostsAvgSentiment:
     def __parser(self, posts):
         list_posts = []
         for p in posts:
-            sentiments = [float(v) for v in p["sentiments"] if v != '']
+            sentiments = [float(v) for v in p["sentiments"] if (v != '' and v != None)]
             if len(sentiments) == 0: continue
             post_stm_avg = sum(sentiments) / len(sentiments)
             p_stm = {

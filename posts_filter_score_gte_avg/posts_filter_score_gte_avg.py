@@ -52,7 +52,7 @@ class PostsFilterScoreGteAvg:
     def __parser(self, posts):
         list_posts = []
         for p in posts:
-            logging.info(f"[STUDENT INFO] {p}")
+            #logging.info(f"[STUDENT INFO] {p}")
             if float(p["score"]) >= self.avg_score:
                 list_posts.append({"url": p["url"]}
                 )

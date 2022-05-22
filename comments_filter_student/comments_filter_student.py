@@ -37,7 +37,7 @@ class CommentsFilterStudent:
                     "score": c["score"]
                 }
                 student_comments.append(cmt)
-        logging.info(f"[STUDENTS FILTER] size={len(student_comments)}")
+        #logging.info(f"[STUDENTS FILTER] size={len(student_comments)}")
         return student_comments
 
     def __filter_student(self, comment):

@@ -19,10 +19,12 @@ services:
       - rabbitmq
     links: 
       - rabbitmq
+    volumes:
+      - ./data:/data
     environment:
       - CHUNKSIZE={}
-      - FILE_COMMETS=comments.csv
-      - FILE_POSTS=posts.csv
+      - FILE_COMMETS=/data/comments.csv
+      - FILE_POSTS=/data/posts.csv
       - COMMETS_QUEUE=comments_queue 
       - POSTS_QUEUE=posts_queue
 
@@ -41,7 +43,7 @@ services:
     links: 
       - rabbitmq
     volumes:
-      - ./posts_max_avg_sentiment/:/
+      - ./posts_max_avg_sentiment/data:/data
     environment:
       - QUEUE_RECV=post_sentiments_queue
       - QUEUE_SEND=post_avg_sentiments_queue
@@ -144,7 +146,7 @@ POSTS_FILTER = """
 REDUCE_SENTIMETS = """
   posts_reduce_avg_sentiment_{}:
     container_name: posts_reduce_avg_sentiment_{}
-    image: posts_avg_sentiment:latest
+    image: posts_reduce_avg_sentiment:latest
     entrypoint: python3 /main.py
     restart: on-failure
     depends_on:

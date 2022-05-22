@@ -29,7 +29,7 @@ class PostsFilterColumns:
             return
         
         posts_to_join, posts_for_avg = self.__parser(posts)
-        logging.info(f"[POST FILTER] {len(posts_to_join)}")
+        #logging.info(f"[POST FILTER] {len(posts_to_join)}")
         
         self.conn_send_join.send(json.dumps(posts_to_join))
         self.conn_send_avg.send(json.dumps(posts_for_avg))
