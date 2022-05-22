@@ -3,7 +3,7 @@ import signal
 import os
 
 from configparser import ConfigParser
-from posts_filter_score_gte_avg import PostsFilterScoreGteAvg
+from posts_reduce_avg_sentiment import PostsAvgSentiment
 
 def initialize_log():
     """
@@ -25,10 +25,8 @@ def initialize_config():
 
     config_params = {}
     try:
-        config_params["QUEUE_RECV_AVG"] = config["DEFAULT"]['QUEUE_RECV_AVG']
-        config_params["QUEUE_RECV_STUDENTS"] = config["DEFAULT"]['QUEUE_RECV_STUDENTS']
+        config_params["QUEUE_RECV"] = config["DEFAULT"]['QUEUE_RECV']
         config_params["QUEUE_SEND"] = config["DEFAULT"]['QUEUE_SEND']
-        config_params["CHUNKSIZE"] = int(config["DEFAULT"]['CHUNKSIZE'])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -44,12 +42,7 @@ def main():
 
         logging.info("Server configuration: {}".format(config_params))
 
-        recver = PostsFilterScoreGteAvg(
-            config_params["QUEUE_RECV_AVG"],
-            config_params["QUEUE_RECV_STUDENTS"],
-            config_params["QUEUE_SEND"],
-            config_params["CHUNKSIZE"]
-        )
+        recver = PostsAvgSentiment(config_params["QUEUE_RECV"], config_params["QUEUE_SEND"])
         recver.start()
     except (KeyboardInterrupt, SystemExit):
         logging.info(f"[MAIN_COMMENTS] Stop event is set")

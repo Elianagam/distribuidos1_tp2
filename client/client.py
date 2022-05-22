@@ -3,15 +3,15 @@ import logging
 import csv
 import json
 from multiprocessing import Process, Queue
-from common.rabbitmq_connection import RabbitMQConnection
+from common.connection import Connection
 
 class Client:
     def __init__(self, comments_queue, posts_queue, file_comments, file_posts, chunksize=10):
-        self.comments_queue = comments_queue
-        self.posts_queue = posts_queue
         self.file_comments = file_comments
         self.file_posts = file_posts
-        self.chunksize = chunksize        
+        self.chunksize = chunksize
+        self.conn_posts = Connection(queue_name=posts_queue, durable=True)
+        self.conn_comments = Connection(queue_name=comments_queue, durable=True)
 
     def start(self):
         comments_sender = Process(target=self.__send_comments())
@@ -28,17 +28,16 @@ class Client:
         fields = ["type","id", "subreddit.id", "subreddit.name",
                   "subreddit.nsfw", "created_utc", "permalink", 
                   "body", "sentiment", "score"]
-        self.__read(self.file_comments, self.comments_queue, fields)
+
+        self.__read(self.file_comments, self.conn_comments, fields)
 
     def __send_posts(self):
         fields = ["type", "id", "subreddit.id", "subreddit.name", 
                   "subreddit.nsfw", "created_utc", "permalink", 
                   "domain", "url", "selftext", "title", "score"]
-        self.__read(self.file_posts, self.posts_queue, fields)
+        self.__read(self.file_posts, self.conn_posts, fields)
 
-    def __read(self, file_name, queue_name, fields):
-        conn = RabbitMQConnection(queue_name)
-
+    def __read(self, file_name, conn, fields):
         with open(file_name, mode='r') as csv_file:
             reader = csv.DictReader(csv_file)
             chunk = []

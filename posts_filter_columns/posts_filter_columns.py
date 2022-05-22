@@ -1,13 +1,14 @@
 import logging
 
 import json
-from common.rabbitmq_connection import RabbitMQConnection
+from common.connection import Connection
+
 
 class PostsFilterColumns:
     def __init__(self, queue_recv, queue_send_to_join, queue_send_to_avg):
-        self.conn_recv = RabbitMQConnection(queue_name=queue_recv)
-        self.conn_send_join = RabbitMQConnection(queue_name=queue_send_to_join)
-        self.conn_send_avg = RabbitMQConnection(queue_name=queue_send_to_avg)
+        self.conn_recv = Connection(queue_name=queue_recv, durable=True)
+        self.conn_send_join = Connection(queue_name=queue_send_to_join)
+        self.conn_send_avg = Connection(queue_name=queue_send_to_avg)
 
     def start(self):
         self.conn_recv.recv(self.__callback)
@@ -20,9 +21,11 @@ class PostsFilterColumns:
         posts = json.loads(body)
 
         if len(posts) == 0:
+            logging.info(f"[POSTS_RECV] END")
             end = json.dumps({"end": True})
             self.conn_send_join.send(end)
             self.conn_send_avg.send(end)
+            ch.basic_ack(delivery_tag=method.delivery_tag)
             return
         
         posts_to_join, posts_for_avg = self.__parser(posts)
@@ -30,6 +33,7 @@ class PostsFilterColumns:
         
         self.conn_send_join.send(json.dumps(posts_to_join))
         self.conn_send_avg.send(json.dumps(posts_for_avg))
+        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __parser(self, posts):
         posts_to_join = []
@@ -38,8 +42,6 @@ class PostsFilterColumns:
             if self.__invalid_post(p):
                 continue
             else:
-                if p["id"] == "tt5aas":
-                    logging.info(f"[SPECIAL KEY] {self.__invalid_post(p)} {p}")
                 post = {"score": float(p["score"])}
                 posts_for_avg.append(post)
                 

@@ -9,9 +9,9 @@ docker-image:
 	docker build -f ./client/Dockerfile -t "client:latest" .
 	docker build -f ./comments_filter_columns/Dockerfile -t "comments_filter_columns:latest" .
 	docker build -f ./comments_filter_student/Dockerfile -t "comments_filter_student:latest" .
+	docker build -f ./posts_filter_score_gte_avg/Dockerfile -t "posts_filter_score_gte_avg:latest" .
 
-	#docker build -f ./comments_groupby_url/Dockerfile -t "comments_groupby_url:latest" .
-	docker build -f ./posts_avg_sentiment/Dockerfile -t "posts_avg_sentiment:latest" .
+	docker build -f ./posts_reduce_avg_sentiment/Dockerfile -t "posts_reduce_avg_sentiment:latest" .
 	docker build -f ./posts_max_avg_sentiment/Dockerfile -t "posts_max_avg_sentiment:latest" .
 
 	docker build -f ./posts_filter_columns/Dockerfile -t "posts_filter_columns:latest" .
@@ -20,7 +20,7 @@ docker-image:
 .PHONY: docker-image
 
 docker-compose-up:
-	docker-compose -f docker-compose.yaml up -d --build
+	docker-compose -f docker-compose.yaml up -d --build --remove-orphans
 .PHONY: docker-compose-up
 
 docker-compose-down:

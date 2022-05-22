@@ -27,7 +27,8 @@ def initialize_config():
     try:
         config_params["QUEUE_RECV_COMMENTS"] = config["DEFAULT"]['QUEUE_RECV_COMMENTS']
         config_params["QUEUE_RECV_POSTS"] = config["DEFAULT"]['QUEUE_RECV_POSTS']
-        config_params["QUEUE_SEND"] = config["DEFAULT"]['QUEUE_SEND']
+        config_params["QUEUE_SEND_STUDENTS"] = config["DEFAULT"]['QUEUE_SEND_STUDENTS']
+        config_params["QUEUE_SEND_SENTIMENTS"] = config["DEFAULT"]['QUEUE_SEND_SENTIMENTS']
         config_params["CHUNKSIZE"] = int(config["DEFAULT"]['CHUNKSIZE'])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
@@ -47,7 +48,8 @@ def main():
         recver = JoinCommentsWithPosts(
             queue_recv_comments=config_params["QUEUE_RECV_COMMENTS"],
             queue_recv_post=config_params["QUEUE_RECV_POSTS"],
-            queue_send=config_params["QUEUE_SEND"],
+            queue_send_students=config_params["QUEUE_SEND_STUDENTS"],
+            queue_send_sentiments=config_params["QUEUE_SEND_SENTIMENTS"],
             chunksize=config_params["CHUNKSIZE"]
             )
         recver.start()
