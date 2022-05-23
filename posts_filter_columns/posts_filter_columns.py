@@ -20,7 +20,7 @@ class PostsFilterColumns:
     def __callback(self, ch, method, properties, body):
         posts = json.loads(body)
 
-        if len(posts) == 0:
+        if len(posts) == 0 or "close" in posts:
             logging.info(f"[POSTS_RECV] END")
             end = json.dumps({"end": True})
             self.conn_send_join.send(end)

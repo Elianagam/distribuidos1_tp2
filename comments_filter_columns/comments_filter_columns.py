@@ -14,7 +14,7 @@ class CommentsFilterColumns:
     def __callback(self, ch, method, properties, body):
         comments = json.loads(body)
 
-        if len(comments) == 0:
+        if len(comments) == 0 or "close" in comments:
             logging.info(f"[COMMENTS_RECV] END")
             self.conn_send.send(json.dumps({"end": True}))
             ch.basic_ack(delivery_tag=method.delivery_tag)

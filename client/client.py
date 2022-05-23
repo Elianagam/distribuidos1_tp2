@@ -1,4 +1,5 @@
 import logging
+import signal
 
 import csv
 import json
@@ -12,6 +13,12 @@ class Client:
         self.chunksize = chunksize
         self.conn_posts = Connection(queue_name=posts_queue, durable=True)
         self.conn_comments = Connection(queue_name=comments_queue, durable=True)
+        signal.signal(signal.SIGINT, self.exit_gracefully)
+
+    def exit_gracefully(self, *args):
+        # Send 
+        self.conn_posts.send(json.dumps({"close": True}))
+        self.conn_comments.send(json.dumps({"close": True}))
 
     def start(self):
         comments_sender = Process(target=self.__send_comments())
