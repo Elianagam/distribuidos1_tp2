@@ -48,6 +48,7 @@ services:
     environment:
       - QUEUE_RECV=post_sentiments_queue
       - QUEUE_SEND=post_avg_sentiments_queue
+      - RECV_WORKERS={}
 
   <POSTS_FILTER_COLUMNS>
 
@@ -112,6 +113,7 @@ FILTER_STUDENTS = """
     environment:
       - QUEUE_RECV=cmt_pst_join_st_queue
       - QUEUE_SEND=posts_student_queue
+      - RECV_WORKERS={}
 """
 
 FILTER_SCORE_STUDENTS = """
@@ -177,11 +179,11 @@ def main():
     filters_ss = ""
     reduce_se = ""
     for x in range(1,filter_exchange+1):
-        filters_s += FILTER_STUDENTS.format(x, x)
+        filters_s += FILTER_STUDENTS.format(x, x, x)
         filters_ss += FILTER_SCORE_STUDENTS.format(x, x, chunksize)
         reduce_se += REDUCE_SENTIMETS.format(x,x)
 
-    compose = INIT_DOCKER.format(chunksize, filters, filters, chunksize, filters, filters) \
+    compose = INIT_DOCKER.format(chunksize, filters, filter_exchange, filters, chunksize, filters, filters) \
                   .replace("<COMMENTS_FILTER_COLUMNS>", filters_c) \
                   .replace("<COMMENTS_FILTER_STUDENTS>", filters_s) \
                   .replace("<POST_FILTER_SCORE_GTE_AVG>", filters_ss) \

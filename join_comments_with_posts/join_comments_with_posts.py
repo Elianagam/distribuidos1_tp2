@@ -1,3 +1,4 @@
+import signal
 import logging
 import pika
 
@@ -59,7 +60,7 @@ class JoinCommentsWithPosts:
                 and self.finish[my_key] == self.recv_workers:
                 self.__send_join_data()
                 # Send end msg to n workers
-                for i in self.send_workers:
+                for i in range(self.send_workers):
                     self.__send_data(readed)
             return True
         return False

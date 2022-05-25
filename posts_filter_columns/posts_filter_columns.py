@@ -1,3 +1,4 @@
+import signal
 import logging
 
 import json
@@ -25,8 +26,8 @@ class PostsFilterColumns:
 
         if "end" in posts:
             logging.info(f"[POSTS_RECV] END")
-            self.conn_send_join.send(end)
-            self.conn_send_avg.send(end)
+            self.conn_send_join.send(json.dumps(posts))
+            self.conn_send_avg.send(json.dumps(posts))
             ch.basic_ack(delivery_tag=method.delivery_tag)
             return
         

@@ -1,3 +1,4 @@
+import signal
 import logging
 
 import json
@@ -47,8 +48,7 @@ class PostsMaxAvgSentiment:
 
     def __get_max_avg_sentiment(self, posts):
         for p in posts:
-            if p["avg_sentiment"] > self.max_avg["avg_sentiment"] \
-                and p["url"][:-3] in ["png", "jpg"]:
+            if p["avg_sentiment"] > self.max_avg["avg_sentiment"]:
                 self.max_avg = p
 
     def __download_image(self):

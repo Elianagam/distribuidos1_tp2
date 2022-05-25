@@ -1,4 +1,5 @@
 import logging
+import signal
 
 import json
 from common.connection import Connection
@@ -20,7 +21,7 @@ class PostsFilterScoreGteAvg:
         self.conn_recv_students.close()
         self.conn_send.close()
 
-        def start(self):
+    def start(self):
         self.conn_recv_avg.recv(self.__callback_avg, start_consuming=False)
         self.conn_recv_students.recv(self.__callback_students)
         
@@ -37,13 +38,12 @@ class PostsFilterScoreGteAvg:
         if self.avg_score != None:
             self.__parser(posts)
         else:
-            logging.info(f"[EARLY ARRIVE] {len(posts)}")
             self.arrived_early.append([p for p in posts])
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __callback_avg(self, ch, method, properties, body):
         avg = json.loads(body)
-
+        logging.info(f"[AVG SCORE?] {avg}")
         if "end" in avg:
             logging.info(f"[AVG END] {self.avg_score}")
             self.__send_arrive_early()
@@ -56,15 +56,14 @@ class PostsFilterScoreGteAvg:
     def __parser(self, posts):
         list_posts = []
         for p in posts:
-            #logging.info(f"[STUDENT INFO] {p}")
             if float(p["score"]) >= self.avg_score:
                 list_posts.append({"url": p["url"]})
             self.total_students += 1
         if len(list_posts) != 0:
-            #logging.info(f" --- [STUDENTS MAX SCORE] {list_posts}")
             self.conn_send.send(json.dumps(list_posts))
 
     def __send_arrive_early(self):
+        logging.info(f"* * [ARRIVE EARLY] {len(self.arrived_early)}")
         n = self.chunksize
         lst = self.arrived_early
         chunks = [lst[i:i + n] for i in range(0, len(lst), n)]
