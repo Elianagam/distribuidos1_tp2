@@ -27,6 +27,7 @@ def initialize_config():
     try:
         config_params["QUEUE_RECV"] = config["DEFAULT"]['QUEUE_RECV']
         config_params["QUEUE_SEND"] = config["DEFAULT"]['QUEUE_SEND']
+        config_params["RECV_WORKERS"] = int(config["DEFAULT"]['RECV_WORKERS'])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -42,7 +43,11 @@ def main():
 
         logging.info("Server configuration: {}".format(config_params))
 
-        recver = CommentsFilterStudent(config_params["QUEUE_RECV"], config_params["QUEUE_SEND"])
+        recver = CommentsFilterStudent(
+            config_params["QUEUE_RECV"],
+            config_params["QUEUE_SEND"],
+            config_params["RECV_WORKERS"]
+        )
         recver.start()
     except (KeyboardInterrupt, SystemExit):
         logging.info(f"[MAIN_COMMENTS] Stop event is set")
