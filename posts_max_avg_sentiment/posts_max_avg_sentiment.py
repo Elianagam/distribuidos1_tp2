@@ -39,7 +39,8 @@ class PostsMaxAvgSentiment:
 
     def __parser(self, posts):
         for p in posts:
-            if p["avg_sentiment"] > self.max_avg["avg_sentiment"]:
+            if p["avg_sentiment"] > self.max_avg["avg_sentiment"] \
+                and p["url"][-3:] in ["png", "jpg"]:
                 self.max_avg = p
 
 
