@@ -1,3 +1,4 @@
+import signal
 import logging
 import pika
 
@@ -6,7 +7,8 @@ from common.connection import Connection
 
 
 class JoinCommentsWithPosts:
-    def __init__(self, queue_recv_comments, queue_recv_post, queue_send_students, queue_send_sentiments, chunksize=10):
+    def __init__(self, queue_recv_comments, queue_recv_post, queue_send_students, 
+            queue_send_sentiments, chunksize, recv_workers, send_workers):
         self.conn_recv_pst = Connection(queue_name=queue_recv_post)
         self.conn_recv_cmt = Connection(queue_name=queue_recv_comments, conn=self.conn_recv_pst)
 
@@ -14,16 +16,21 @@ class JoinCommentsWithPosts:
         self.conn_send_se = Connection(queue_name=queue_send_sentiments, durable=True)
         self.join_dict = {}
         self.chunksize = chunksize
-        self.finish = {"posts": False, "comments": False}
+        self.finish = {"posts": 0, "comments": 0}
+        signal.signal(signal.SIGINT, self.exit_gracefully)
+        self.recv_workers = recv_workers
+        self.send_workers = send_workers
 
-    def start(self):
-        self.conn_recv_pst.recv(self.__callback_recv_posts, start_consuming=False)
-        self.conn_recv_cmt.recv(self.__callback_recv_comments)
-        
+    def exit_gracefully(self, *args):
         self.conn_recv_cmt.close()
         self.conn_recv_pst.close()
         self.conn_send_st.close()
         self.conn_send_se.close()
+
+    def start(self):
+        self.conn_recv_pst.recv(self.__callback_recv_posts, start_consuming=False)
+        self.conn_recv_cmt.recv(self.__callback_recv_comments)
+        self.exit_gracefully()
 
     def __callback_recv_comments(self, ch, method, properties, body):
         comments = json.loads(body)
@@ -47,18 +54,20 @@ class JoinCommentsWithPosts:
 
     def __finish(self, my_key, other_key, readed):
         if "end" in readed:
-            if self.finish[other_key]:
-                self.finish[my_key] = True
-                logging.info(f"[FINISH JOIN ALL?] {self.finish}")
+            self.finish[my_key] += 1
+            logging.info(f"[FINISH JOIN ALL?] {self.finish} | Workers: {self.recv_workers}")
+            if self.finish[other_key] == self.recv_workers \
+                and self.finish[my_key] == self.recv_workers:
                 self.__send_join_data()
-                # Send end msg 
-                self.conn_send_st.send(json.dumps(readed))
-                self.conn_send_se.send(json.dumps(readed))
-            else:
-                self.finish[my_key] = True
-                logging.info(f"[FINISH JOIN] {self.finish}")
+                # Send end msg to n workers
+                for i in range(self.send_workers):
+                    self.__send_data(readed)
             return True
         return False
+
+    def __send_data(self, data):
+        self.conn_send_st.send(json.dumps(data))
+        self.conn_send_se.send(json.dumps(data))
 
     def __add_comments(self, list_comments):
         for c in list_comments:
@@ -86,17 +95,14 @@ class JoinCommentsWithPosts:
         chunk = []
         for post_id, post in self.join_dict.items():
             if not "url" in self.join_dict[post_id]:
-                #logging.info(f"[MISS DATA] [POST ID] {post_id} [KEYS] {self.join_dict[post_id].keys()}")
                 continue
             if len(chunk) == self.chunksize:
-                self.conn_send_st.send(json.dumps(chunk))
-                self.conn_send_se.send(json.dumps(chunk))
+                self.__send_data(chunk)
                 chunk = []
             
             chunk.append(post)
 
         # send last data in chunk
         if len(chunk) > 0:
-            self.conn_send_st.send(json.dumps(chunk))
-            self.conn_send_se.send(json.dumps(chunk))
+            self.__send_data(chunk)
 
