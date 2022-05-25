@@ -38,7 +38,7 @@ class PostsMaxAvgSentiment:
     def __end_recv(self, end_msg):
         # Send only post with max avg sentiment
         logging.info(f" --- [POST MAX AVG SENTIMENT] {self.max_avg}")
-        self.conn_send.send(json.dumps(self.max_avg["url"]))
+        self.conn_send.send(json.dumps(self.max_avg))
 
         if self.max_avg["url"] != None:
             download = self.__download_image()
@@ -55,6 +55,7 @@ class PostsMaxAvgSentiment:
     def __download_image(self):
         import requests 
         import shutil
+        import base64
 
         image_url = self.max_avg["url"]
         filename = "data/max_avg_sentiment.jpg"
@@ -67,7 +68,9 @@ class PostsMaxAvgSentiment:
             
             with open(filename, "rb") as image:
                 b = bytearray(image.read())
+                encoded = base64.b64encode(b)
+                data = encoded.decode('ascii')  
                 logging.info(f"[DOWNLOAD_IMAGE] Success {filename}")
-                return {"image_bytes": b}
+                return {"image_bytes": data}
         else:
             logging.error(f"[DOWNLOAD_IMAGE] Fail")

@@ -30,10 +30,10 @@ class CommentsFilterStudent:
                 self.conn_send.send(json.dumps(comments))
             ch.basic_ack(delivery_tag=method.delivery_tag)
             return
-        
-        result = self.__parser(comments)
-        self.conn_send.send(json.dumps(result))
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+        else:
+            result = self.__parser(comments)
+            self.conn_send.send(json.dumps(result))
+            ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __parser(self, comments):
         student_comments = []

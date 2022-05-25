@@ -20,7 +20,7 @@ services:
     volumes:
       - ./data:/data
     environment:
-      - CHUNKSIZE=500
+      - CHUNKSIZE=1000
       - FILE_COMMETS=/data/comments.csv
       - FILE_POSTS=/data/posts.csv
       - COMMETS_QUEUE=comments_queue 
@@ -97,7 +97,7 @@ services:
       - QUEUE_RECV_AVG=posts_avg_score_queue
       - QUEUE_RECV_STUDENTS=posts_student_queue
       - QUEUE_SEND=student_url_queue
-      - CHUNKSIZE=500
+      - CHUNKSIZE=1000
 
   posts_filter_score_gte_avg_2:
     container_name: posts_filter_score_gte_avg_2
@@ -112,7 +112,7 @@ services:
       - QUEUE_RECV_AVG=posts_avg_score_queue
       - QUEUE_RECV_STUDENTS=posts_student_queue
       - QUEUE_SEND=student_url_queue
-      - CHUNKSIZE=500
+      - CHUNKSIZE=1000
 
   
   posts_reduce_avg_sentiment_1:
@@ -216,6 +216,6 @@ services:
       - QUEUE_RECV_POSTS=posts_for_join_queue
       - QUEUE_SEND_STUDENTS=cmt_pst_join_st_queue
       - QUEUE_SEND_SENTIMENTS=cmt_pst_join_se_queue
-      - CHUNKSIZE=500
+      - CHUNKSIZE=1000
       - RECV_WORKERS=2
       - SEND_WORKERS=2

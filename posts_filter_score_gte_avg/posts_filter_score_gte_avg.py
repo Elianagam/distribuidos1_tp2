@@ -43,7 +43,6 @@ class PostsFilterScoreGteAvg:
 
     def __callback_avg(self, ch, method, properties, body):
         avg = json.loads(body)
-        logging.info(f"[AVG SCORE?] {avg}")
         if "end" in avg:
             logging.info(f"[AVG END] {self.avg_score}")
             self.__send_arrive_early()
@@ -63,7 +62,6 @@ class PostsFilterScoreGteAvg:
             self.conn_send.send(json.dumps(list_posts))
 
     def __send_arrive_early(self):
-        logging.info(f"* * [ARRIVE EARLY] {len(self.arrived_early)}")
         n = self.chunksize
         lst = self.arrived_early
         chunks = [lst[i:i + n] for i in range(0, len(lst), n)]

@@ -183,7 +183,7 @@ def main():
         filters_ss += FILTER_SCORE_STUDENTS.format(x, x, chunksize)
         reduce_se += REDUCE_SENTIMETS.format(x,x)
 
-    compose = INIT_DOCKER.format(chunksize, filters, filter_exchange, filters, chunksize, filters, filters) \
+    compose = INIT_DOCKER.format(chunksize, filters, filter_exchange, filters, chunksize, filters, filter_exchange) \
                   .replace("<COMMENTS_FILTER_COLUMNS>", filters_c) \
                   .replace("<COMMENTS_FILTER_STUDENTS>", filters_s) \
                   .replace("<POST_FILTER_SCORE_GTE_AVG>", filters_ss) \
