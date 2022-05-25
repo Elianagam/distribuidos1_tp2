@@ -27,6 +27,7 @@ services:
       - FILE_POSTS=/data/posts.csv
       - COMMETS_QUEUE=comments_queue 
       - POSTS_QUEUE=posts_queue
+      - SEND_WORKERS={}
 
   <COMMENTS_FILTER_COLUMNS>
   <COMMENTS_FILTER_STUDENTS>
@@ -62,6 +63,7 @@ services:
     environment:
       - QUEUE_RECV=posts_for_avg_queue
       - QUEUE_SEND=posts_avg_score_queue
+      - RECV_WORKERS={}
 
   join_comments_with_posts:
     container_name: join_comments_with_posts
@@ -78,6 +80,8 @@ services:
       - QUEUE_SEND_STUDENTS=cmt_pst_join_st_queue
       - QUEUE_SEND_SENTIMENTS=cmt_pst_join_se_queue
       - CHUNKSIZE={}
+      - RECV_WORKERS={}
+      - SEND_WORKERS={}
 """
 
 COMENTS_FILTERS = """
@@ -177,7 +181,7 @@ def main():
         filters_ss += FILTER_SCORE_STUDENTS.format(x, x, chunksize)
         reduce_se += REDUCE_SENTIMETS.format(x,x)
 
-    compose = INIT_DOCKER.format(chunksize, chunksize) \
+    compose = INIT_DOCKER.format(chunksize, filters, filters, chunksize, filters, filters) \
                   .replace("<COMMENTS_FILTER_COLUMNS>", filters_c) \
                   .replace("<COMMENTS_FILTER_STUDENTS>", filters_s) \
                   .replace("<POST_FILTER_SCORE_GTE_AVG>", filters_ss) \

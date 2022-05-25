@@ -25,6 +25,7 @@ services:
       - FILE_POSTS=/data/posts.csv
       - COMMETS_QUEUE=comments_queue 
       - POSTS_QUEUE=posts_queue
+      - SEND_WORKERS=2
 
   
   comments_filter_columns_1:
@@ -196,6 +197,7 @@ services:
     environment:
       - QUEUE_RECV=posts_for_avg_queue
       - QUEUE_SEND=posts_avg_score_queue
+      - RECV_WORKERS=2
 
   join_comments_with_posts:
     container_name: join_comments_with_posts
@@ -212,3 +214,5 @@ services:
       - QUEUE_SEND_STUDENTS=cmt_pst_join_st_queue
       - QUEUE_SEND_SENTIMENTS=cmt_pst_join_se_queue
       - CHUNKSIZE=200
+      - RECV_WORKERS=2
+      - SEND_WORKERS=2

@@ -12,6 +12,20 @@ class PostsFilterScoreGteAvg:
         self.avg_score = None
         self.arrived_early = []
         self.chunksize = chunksize
+        self.total_students = 0
+        signal.signal(signal.SIGINT, self.exit_gracefully)
+
+    def exit_gracefully(self, *args):
+        self.conn_recv_avg.close()
+        self.conn_recv_students.close()
+        self.conn_send.close()
+
+        def start(self):
+        self.conn_recv_avg.recv(self.__callback_avg, start_consuming=False)
+        self.conn_recv_students.recv(self.__callback_students)
+        
+        logging.info(f" --- [STUDENTS MAX SCORE] TOTAL: {len(self.total_students)}")
+        self.exit_gracefully()
 
     def __callback_students(self, ch, method, properties, body):
         posts = json.loads(body)
@@ -21,7 +35,6 @@ class PostsFilterScoreGteAvg:
             return
 
         if self.avg_score != None:
-            # TODO NOTHING UNTIL AVG != None
             self.__parser(posts)
         else:
             logging.info(f"[EARLY ARRIVE] {len(posts)}")
@@ -40,24 +53,15 @@ class PostsFilterScoreGteAvg:
         self.avg_score = float(avg["posts_score_avg"])
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
-
-    def start(self):
-        self.conn_recv_avg.recv(self.__callback_avg, start_consuming=False)
-        self.conn_recv_students.recv(self.__callback_students)
-        
-        self.conn_recv_avg.close()
-        self.conn_recv_students.close()
-        self.conn_send.close()
-
     def __parser(self, posts):
         list_posts = []
         for p in posts:
             #logging.info(f"[STUDENT INFO] {p}")
             if float(p["score"]) >= self.avg_score:
-                list_posts.append({"url": p["url"]}
-                )
+                list_posts.append({"url": p["url"]})
+            self.total_students += 1
         if len(list_posts) != 0:
-            logging.info(f" --- [STUDENTS MAX SCORE] {list_posts}")
+            #logging.info(f" --- [STUDENTS MAX SCORE] {list_posts}")
             self.conn_send.send(json.dumps(list_posts))
 
     def __send_arrive_early(self):

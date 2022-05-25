@@ -5,30 +5,36 @@ from common.connection import Connection
 
 
 class PostsAvgScore:
-    def __init__(self, queue_recv, queue_send):
+    def __init__(self, queue_recv, queue_send, recv_workers):
         self.conn_recv = Connection(queue_name=queue_recv)
         self.conn_send = Connection(exchange_name=queue_send)
         self.count_posts = 0 
-        self.sum_score = 0 
+        self.sum_score = 0
+        self.recv_workers = recv_workers
+        self.end_recv = 0
+        signal.signal(signal.SIGINT, self.exit_gracefully)
+
+    def exit_gracefully(self, *args):
+        self.conn_recv.close()
+        self.conn_send.close()
+
+    def start(self):
+        self.conn_recv.recv(self.__callback)
+        self.exit_gracefully()
 
     def __callback(self, ch, method, properties, body):
         posts = json.loads(body)
 
         if "end" in posts:
-            avg = self.__calculate_avg()
-            self.conn_send.send(json.dumps({"posts_score_avg": avg}))
-            self.conn_send.send(json.dumps(posts))
+            self.end_recv += 1
+            if self.end_recv == self.recv_workers:
+                self.__calculate_avg()
+                self.conn_send.send(json.dumps(posts))
             ch.basic_ack(delivery_tag=method.delivery_tag)
             return
-
-        self.__sum_score(posts)
-        ch.basic_ack(delivery_tag=method.delivery_tag)
-
-    def start(self):
-        self.conn_recv.recv(self.__callback)
-        
-        self.conn_recv.close()
-        self.conn_send.close()
+        else:
+            self.__sum_score(posts)
+            ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __sum_score(self, posts):
         for p in posts:
@@ -41,4 +47,4 @@ class PostsAvgScore:
         avg = self.sum_score / self.count_posts
         
         logging.info(f" --- [POST_SCORE_AVG] {avg}")
-        return avg
+        self.conn_send.send(json.dumps({"posts_score_avg": avg}))
