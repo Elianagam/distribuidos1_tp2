@@ -31,6 +31,10 @@ def initialize_config():
         config_params["POSTS_QUEUE"] = config["DEFAULT"]['POSTS_QUEUE']
         config_params["COMMETS_QUEUE"] = config["DEFAULT"]['COMMETS_QUEUE']
         config_params["SEND_WORKERS"] = int(config["DEFAULT"]['SEND_WORKERS'])
+
+        config_params["STUDENTS_QUEUE"] = config["DEFAULT"]['STUDENTS_QUEUE']
+        config_params["AVG_QUEUE"] = config["DEFAULT"]['AVG_QUEUE']
+        config_params["IMAGE_QUEUE"] = config["DEFAULT"]['IMAGE_QUEUE']
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -55,7 +59,10 @@ def main():
             config_params["FILE_COMMETS"],
             config_params["FILE_POSTS"],
             config_params["CHUNKSIZE"],
-            config_params["SEND_WORKERS"]
+            config_params["SEND_WORKERS"],
+            config_params["STUDENTS_QUEUE"],
+            config_params["AVG_QUEUE"],
+            config_params["IMAGE_QUEUE"]
         )
         client.start()
     except (KeyboardInterrupt, SystemExit):

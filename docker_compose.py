@@ -28,6 +28,9 @@ services:
       - COMMETS_QUEUE=comments_queue 
       - POSTS_QUEUE=posts_queue
       - SEND_WORKERS={}
+      - STUDENTS_QUEUE=student_url_queue
+      - AVG_QUEUE=posts_avg_score_queue
+      - IMAGE_QUEUE=post_avg_sentiments_queue
 
   <COMMENTS_FILTER_COLUMNS>
   <COMMENTS_FILTER_STUDENTS>

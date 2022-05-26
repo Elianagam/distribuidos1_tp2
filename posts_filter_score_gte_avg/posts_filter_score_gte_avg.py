@@ -14,11 +14,10 @@ class PostsFilterScoreGteAvg:
         self.arrived_early = []
         self.chunksize = chunksize
         self.total_students = 0
-        signal.signal(signal.SIGINT, self.exit_gracefully)
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):
         self.conn_recv_avg.close()
-        self.conn_recv_students.close()
         self.conn_send.close()
 
     def start(self):
@@ -33,6 +32,7 @@ class PostsFilterScoreGteAvg:
 
         if "end" in posts:
             ch.basic_ack(delivery_tag=method.delivery_tag)
+            self.conn_send.send(json.dumps(posts))
             return
 
         if self.avg_score != None:

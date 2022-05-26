@@ -17,13 +17,12 @@ class JoinCommentsWithPosts:
         self.join_dict = {}
         self.chunksize = chunksize
         self.finish = {"posts": 0, "comments": 0}
-        signal.signal(signal.SIGINT, self.exit_gracefully)
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
         self.recv_workers = recv_workers
         self.send_workers = send_workers
 
     def exit_gracefully(self, *args):
         self.conn_recv_cmt.close()
-        self.conn_recv_pst.close()
         self.conn_send_st.close()
         self.conn_send_se.close()
 

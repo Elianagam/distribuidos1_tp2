@@ -10,7 +10,7 @@ class CommentsFilterColumns:
     def __init__(self, queue_recv, queue_send):
         self.conn_recv = Connection(queue_name=queue_recv, durable=True)
         self.conn_send = Connection(queue_name=queue_send)
-        signal.signal(signal.SIGINT, self.exit_gracefully)
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):
         self.conn_recv.close()

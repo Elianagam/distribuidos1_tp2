@@ -13,7 +13,7 @@ class PostsAvgScore:
         self.sum_score = 0
         self.recv_workers = recv_workers
         self.end_recv = 0
-        signal.signal(signal.SIGINT, self.exit_gracefully)
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):
         self.conn_recv.close()
@@ -48,4 +48,5 @@ class PostsAvgScore:
         avg = self.sum_score / self.count_posts
         
         logging.info(f" --- [POST_SCORE_AVG] {avg}")
+        self.conn_send.send(json.dumps({"posts_score_avg": avg}))
         self.conn_send.send(json.dumps({"posts_score_avg": avg}))

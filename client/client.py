@@ -1,37 +1,69 @@
 import logging
 import signal
-
 import csv
 import json
-from multiprocessing import Process, Queue
+from multiprocessing import Process
 from common.connection import Connection
 
 class Client:
-    def __init__(self, comments_queue, posts_queue, file_comments, file_posts, chunksize, send_workers):
+    def __init__(self, comments_queue, posts_queue, 
+        file_comments, file_posts, chunksize, send_workers,
+        students_queue, avg_queue, image_queue):
         self.file_comments = file_comments
         self.file_posts = file_posts
         self.chunksize = chunksize
         self.send_workers = send_workers
+
+        self.students_queue = students_queue
+        self.avg_queue = avg_queue
+        self.image_queue = image_queue
+        self.students_recved = []
         self.conn_posts = Connection(queue_name=posts_queue, durable=True)
-        self.conn_comments = Connection(queue_name=comments_queue, durable=True)
-        signal.signal(signal.SIGINT, self.exit_gracefully)
+        self.conn_comments = Connection(queue_name=comments_queue, durable=True, conn=self.conn_posts)
+
+        #self.conn_recv_students = Connection(queue_name=self.students_queue)
+        #self.conn_recv_avg = Connection(queue_name=self.avg_queue, conn=self.conn_recv_students)
+        #self.conn_recv_image = Connection(queue_name=self.image_queue, conn=self.conn_recv_students)
+        self.comments_sender = Process(target=self.__send_comments())
+        self.posts_sender = Process(target=self.__send_posts())
+        #self.sink_recver = Process(target=self.__recv_sinks())
+        
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):
-        # Send 
-        for i in range(self.send_workers):
-            self.conn_posts.close()
-            self.conn_comments.close()
+        self.conn_posts.close()
 
     def start(self):
         logging.info(f"[CLIENT] started...")
-        comments_sender = Process(target=self.__send_comments())
-        posts_sender = Process(target=self.__send_posts())
 
-        comments_sender.start()
-        comments_sender.join()
+        self.comments_sender.start()
+        self.posts_sender.start()
+        #self.sink_recver.start()
 
-        posts_sender.start()
-        posts_sender.join()
+        self.comments_sender.join()
+        self.posts_sender.join()
+        #self.sink_recver.join()
+        self.exit_gracefully()
+
+#    def __recv_sinks(self):
+#        self.conn_recv_students.recv(self.__callback_students)
+#        self.conn_recv_avg.recv(self.__callback)
+#        self.conn_recv_image.recv(self.__callback)
+#        logging.info(f"[CLIENT RECV] Students {len(self.students_recved)}")#
+
+#    def __callback_students(self, ch, method, properties, body):
+#        sink_recv = json.loads(body)
+#        
+#        if "end" in sink_recv:
+#            logging.info(f"[CLIENT RECV END STUDENT] {len(self.students_recved)}")
+#            return#
+
+#        for student in sink_recv:
+#            self.students_recved.append(student)#
+
+#    def __callback(self, ch, method, properties, body):
+#        sink_recv = json.loads(body)
+#        logging.info(f"* * * [CLIENT RECV] {sink_recv}")
 
     def __send_comments(self):
         fields = ["type","id", "subreddit.id", "subreddit.name",
@@ -63,4 +95,3 @@ class Client:
         for i in range(self.send_workers):
             conn.send(json.dumps({"end": True}))
         
-        conn.close()

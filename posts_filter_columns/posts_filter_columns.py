@@ -10,7 +10,7 @@ class PostsFilterColumns:
         self.conn_recv = Connection(queue_name=queue_recv, durable=True)
         self.conn_send_join = Connection(queue_name=queue_send_to_join)
         self.conn_send_avg = Connection(queue_name=queue_send_to_avg)
-        signal.signal(signal.SIGINT, self.exit_gracefully)
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):
         self.conn_recv.close()

@@ -12,7 +12,7 @@ class PostsMaxAvgSentiment:
         self.max_avg = {"url": None, "avg_sentiment": 0}
         self.recv_workers = recv_workers
         self.end_recv = 0
-        signal.signal(signal.SIGINT, self.exit_gracefully)
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):
         self.conn_recv.close()
@@ -28,7 +28,7 @@ class PostsMaxAvgSentiment:
         if "end" in posts:
             self.end_recv += 1
             if self.end_recv == self.recv_workers:
-                self.__end_recv(posts)
+                self.__end_recv(json.dumps(posts))
             ch.basic_ack(delivery_tag=method.delivery_tag)
             return
         else:

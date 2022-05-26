@@ -6,8 +6,8 @@ import json
 
 class Connection:
     def __init__(self, queue_name='', exchange_name='', bind=False, conn=None, durable=False):
-        time.sleep(20)
         if not conn:
+            time.sleep(20)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
             self.channel = self.connection.channel()
         else:
@@ -57,8 +57,8 @@ class Connection:
             self.channel.start_consuming()
 
     def close(self):
-        self.connection.close()
         self.channel.stop_consuming()
+        self.connection.close()
 
     def get_connection():
         return self.connection, self.channel

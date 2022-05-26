@@ -11,7 +11,7 @@ class CommentsFilterStudent:
         self.conn_send = Connection(queue_name=queue_send)
         self.end_recv = 0
         self.recv_workers = recv_workers
-        signal.signal(signal.SIGINT, self.exit_gracefully)
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):
         self.conn_recv.close()
