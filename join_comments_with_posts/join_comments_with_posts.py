@@ -27,8 +27,8 @@ class JoinCommentsWithPosts:
         self.conn_send_se.close()
 
     def start(self):
-        self.conn_recv_pst.recv(self.__callback_recv_posts, start_consuming=False)
-        self.conn_recv_cmt.recv(self.__callback_recv_comments)
+        self.conn_recv_cmt.recv(self.__callback_recv_comments, start_consuming=False)
+        self.conn_recv_pst.recv(self.__callback_recv_posts)
         self.exit_gracefully()
 
     def __callback_recv_comments(self, ch, method, properties, body):
