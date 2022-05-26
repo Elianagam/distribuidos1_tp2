@@ -38,7 +38,7 @@ class PostsMaxAvgSentiment:
     def __end_recv(self, end_msg):
         # Send only post with max avg sentiment
         logging.info(f" --- [POST MAX AVG SENTIMENT] {self.max_avg}")
-        self.conn_send.send(json.dumps(self.max_avg))
+        #self.conn_send.send(json.dumps(self.max_avg))
 
         if self.max_avg["url"] != None:
             download = self.__download_image()

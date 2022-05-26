@@ -26,8 +26,8 @@ class CommentsFilterStudent:
 
         if "end" in comments:
             self.end_recv += 1
-            if self.end_recv == self.recv_workers:
-                self.conn_send.send(json.dumps(comments))
+            #if self.end_recv == self.recv_workers:
+            self.conn_send.send(json.dumps(comments))
             ch.basic_ack(delivery_tag=method.delivery_tag)
             return
         else:

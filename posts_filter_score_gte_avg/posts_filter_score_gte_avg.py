@@ -24,13 +24,13 @@ class PostsFilterScoreGteAvg:
         self.conn_recv_avg.recv(self.__callback_avg, start_consuming=False)
         self.conn_recv_students.recv(self.__callback_students)
         
-        logging.info(f" --- [STUDENTS MAX SCORE] TOTAL: {len(self.total_students)}")
         self.exit_gracefully()
 
     def __callback_students(self, ch, method, properties, body):
         posts = json.loads(body)
 
         if "end" in posts:
+            logging.info(f" --- [STUDENTS MAX SCORE] TOTAL: {self.total_students}")
             ch.basic_ack(delivery_tag=method.delivery_tag)
             self.conn_send.send(json.dumps(posts))
             return
@@ -57,7 +57,7 @@ class PostsFilterScoreGteAvg:
         for p in posts:
             if float(p["score"]) >= self.avg_score:
                 list_posts.append({"url": p["url"]})
-            self.total_students += 1
+                self.total_students += 1
         if len(list_posts) != 0:
             self.conn_send.send(json.dumps(list_posts))
 

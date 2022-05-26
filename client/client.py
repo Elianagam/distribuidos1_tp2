@@ -14,10 +14,6 @@ class Client:
         self.chunksize = chunksize
         self.send_workers = send_workers
 
-        self.students_queue = students_queue
-        self.avg_queue = avg_queue
-        self.image_queue = image_queue
-        self.students_recved = []
         self.conn_posts = Connection(queue_name=posts_queue, durable=True)
         self.conn_comments = Connection(queue_name=comments_queue, durable=True, conn=self.conn_posts)
 
