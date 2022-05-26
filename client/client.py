@@ -47,9 +47,8 @@ class Client:
 
     def __recv_sinks(self):
         self.conn_recv_students.recv(self.__callback_students, start_consuming=False)
-        self.conn_recv_avg.recv(self.__callback, start_consuming=False)
-        self.conn_recv_image.recv(self.__callback)
-        logging.info(f"[CLIENT RECV] Students {len(self.students_recved)}")
+        self.conn_recv_avg.recv(self.__callback)
+        #self.conn_recv_image.recv(self.__callback)
 
     def __callback_students(self, ch, method, properties, body):
         sink_recv = json.loads(body)

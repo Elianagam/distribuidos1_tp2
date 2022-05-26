@@ -28,7 +28,7 @@ class PostsMaxAvgSentiment:
         if "end" in posts:
             self.end_recv += 1
             if self.end_recv == self.recv_workers:
-                self.__end_recv(json.dumps(posts))
+                self.__end_recv(posts)
             ch.basic_ack(delivery_tag=method.delivery_tag)
             return
         else:
@@ -38,13 +38,13 @@ class PostsMaxAvgSentiment:
     def __end_recv(self, end_msg):
         # Send only post with max avg sentiment
         logging.info(f" --- [POST MAX AVG SENTIMENT] {self.max_avg}")
-        self.conn_send.send(json.dumps(self.max_avg))
+        #self.conn_send.send(json.dumps(self.max_avg))
 
         if self.max_avg["url"] != None:
             download = self.__download_image()
             self.conn_send.send(json.dumps(download))
 
-        self.conn_send.send(json.dumps(end_msg))
+        #self.conn_send.send(json.dumps(end_msg))
 
     def __get_max_avg_sentiment(self, posts):
         for p in posts:
