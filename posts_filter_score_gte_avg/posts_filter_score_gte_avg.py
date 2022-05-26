@@ -7,7 +7,7 @@ from common.connection import Connection
 
 class PostsFilterScoreGteAvg:
     def __init__(self, queue_recv_avg, queue_recv_students, queue_send, chunksize=10):
-        self.conn_recv_students = Connection(queue_name=queue_recv_students)
+        self.conn_recv_students = Connection(queue_name=queue_recv_students, durable=True)
         self.conn_recv_avg = Connection(exchange_name=queue_recv_avg, bind=True, conn=self.conn_recv_students)
         self.conn_send = Connection(queue_name=queue_send)
         self.avg_score = None
