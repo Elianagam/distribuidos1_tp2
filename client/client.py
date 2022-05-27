@@ -1,35 +1,39 @@
 import logging
 import signal
-
 import csv
 import json
-from multiprocessing import Process, Queue
+from multiprocessing import Process
 from common.connection import Connection
 
 class Client:
-    def __init__(self, comments_queue, posts_queue, file_comments, file_posts, chunksize=10):
+    def __init__(self, comments_queue, posts_queue, 
+        file_comments, file_posts, chunksize, send_workers,
+        students_queue, avg_queue, image_queue):
         self.file_comments = file_comments
         self.file_posts = file_posts
         self.chunksize = chunksize
+        self.send_workers = send_workers
+
         self.conn_posts = Connection(queue_name=posts_queue, durable=True)
-        self.conn_comments = Connection(queue_name=comments_queue, durable=True)
-        signal.signal(signal.SIGINT, self.exit_gracefully)
+        self.conn_comments = Connection(queue_name=comments_queue, durable=True, conn=self.conn_posts)
+
+        self.comments_sender = Process(target=self.__send_comments())
+        self.posts_sender = Process(target=self.__send_posts())
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):
-        # Send 
-        self.conn_posts.send(json.dumps({"close": True}))
-        self.conn_comments.send(json.dumps({"close": True}))
+        self.conn_posts.close()
 
     def start(self):
-        comments_sender = Process(target=self.__send_comments())
-        posts_sender = Process(target=self.__send_posts())
-
-        comments_sender.start()
-        comments_sender.join()
-
-        posts_sender.start()
-        posts_sender.join()
         logging.info(f"[CLIENT] started...")
+
+        self.comments_sender.start()
+        self.posts_sender.start()
+
+        self.comments_sender.join()
+        self.posts_sender.join()
+        self.exit_gracefully()
+
 
     def __send_comments(self):
         fields = ["type","id", "subreddit.id", "subreddit.name",
@@ -58,6 +62,6 @@ class Client:
                 conn.send(json.dumps(chunk))
 
         # send empty when finish
-        conn.send(json.dumps({}))
+        for i in range(self.send_workers):
+            conn.send(json.dumps({"end": True}))
         
-        conn.close()
