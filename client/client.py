@@ -22,7 +22,7 @@ class Client:
         self.conn_comments = Connection(queue_name=comments_queue, durable=True, conn=self.conn_posts)
 
         self.conn_recv_students = Connection(queue_name=self.students_queue)
-        self.conn_recv_avg = Connection(queue_name=self.avg_queue, conn=self.conn_recv_students)
+        self.conn_recv_avg = Connection(exchange_name=self.avg_queue, bind=True, conn=self.conn_recv_students)
         self.conn_recv_image = Connection(queue_name=self.image_queue, conn=self.conn_recv_students)
         self.comments_sender = Process(target=self.__send_comments())
         self.posts_sender = Process(target=self.__send_posts())
@@ -47,8 +47,8 @@ class Client:
 
     def __recv_sinks(self):
         self.conn_recv_students.recv(self.__callback_students, start_consuming=False)
-        self.conn_recv_avg.recv(self.__callback)
-        #self.conn_recv_image.recv(self.__callback)
+        self.conn_recv_avg.recv(self.__callback, start_consuming=False)
+        self.conn_recv_image.recv(self.__callback)
 
     def __callback_students(self, ch, method, properties, body):
         sink_recv = json.loads(body)
@@ -56,13 +56,12 @@ class Client:
         if "end" in sink_recv:
             logging.info(f"[CLIENT RECV END STUDENT] {len(self.students_recved)}")
             return
-
         for student in sink_recv:
             self.students_recved.append(student)
 
     def __callback(self, ch, method, properties, body):
         sink_recv = json.loads(body)
-        logging.info(f"* * * [CLIENT RECV] {sink_recv}")
+        logging.info(f"* * * [CLIENT RECV] {sink_recv.keys()}")
 
     def __send_comments(self):
         fields = ["type","id", "subreddit.id", "subreddit.name",
