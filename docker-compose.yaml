@@ -21,8 +21,8 @@ services:
       - ./data:/data
     environment:
       - CHUNKSIZE=10
-      - FILE_COMMETS=/data/comments_r.csv
-      - FILE_POSTS=/data/posts_r.csv
+      - FILE_COMMETS=/data/comments.csv
+      - FILE_POSTS=/data/posts.csv
       - COMMETS_QUEUE=comments_queue 
       - POSTS_QUEUE=posts_queue
       - SEND_WORKERS=2

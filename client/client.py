@@ -18,12 +18,12 @@ class Client:
         self.avg_queue = avg_queue
         self.image_queue = image_queue
         self.students_recved = []
-        self.conn_posts = Connection(queue_name=posts_queue, durable=True)
-        self.conn_comments = Connection(queue_name=comments_queue, durable=True, conn=self.conn_posts)
+        self.conn_posts = Connection(queue_name=posts_queue)
+        self.conn_comments = Connection(queue_name=comments_queue, conn=self.conn_posts)
 
-        self.conn_recv_students = Connection(queue_name=self.students_queue)
-        self.conn_recv_avg = Connection(exchange_name=self.avg_queue, bind=True, conn=self.conn_recv_students)
-        self.conn_recv_image = Connection(queue_name=self.image_queue, conn=self.conn_recv_students)
+        self.conn_recv_students = Connection(queue_name=self.students_queue, conn=self.conn_posts)
+        self.conn_recv_avg = Connection(exchange_name=self.avg_queue, bind=True, conn=self.conn_posts)
+        self.conn_recv_image = Connection(queue_name=self.image_queue, conn=self.conn_posts)
         self.comments_sender = Process(target=self.__send_comments())
         self.posts_sender = Process(target=self.__send_posts())
         self.sink_recver = Process(target=self.__recv_sinks())
@@ -52,16 +52,20 @@ class Client:
 
     def __callback_students(self, ch, method, properties, body):
         sink_recv = json.loads(body)
+        logging.info(f"* * * [CLIENT RECV END STUDENT] {sink_recv}")
         
         if "end" in sink_recv:
-            logging.info(f"[CLIENT RECV END STUDENT] {len(self.students_recved)}")
+            ch.basic_ack(delivery_tag=method.delivery_tag)
             return
         for student in sink_recv:
             self.students_recved.append(student)
+        
+        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __callback(self, ch, method, properties, body):
         sink_recv = json.loads(body)
         logging.info(f"* * * [CLIENT RECV] {sink_recv.keys()}")
+        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __send_comments(self):
         fields = ["type","id", "subreddit.id", "subreddit.name",
