@@ -11,7 +11,6 @@ class Connection:
             self.connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
             self.channel = self.connection.channel()
         else:
-            logging.info(f"[CONECTION] {conn.connection}, {conn.channel}")
             self.connection = conn.connection
             self.channel = conn.channel
 
@@ -51,7 +50,7 @@ class Connection:
         self.channel.basic_consume(
             queue=self.queue_name,
             on_message_callback=callback,
-            #auto_ack=True
+            #auto_ack=auto_ack
         )
         if start_consuming:
             self.channel.start_consuming()
