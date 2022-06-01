@@ -8,7 +8,7 @@ from common.connection import Connection
 class CommentsFilterStudent:
     def __init__(self, queue_recv, queue_send, recv_workers):
         self.conn_recv = Connection(queue_name=queue_recv, durable=True)
-        self.conn_send = Connection(queue_name=queue_send)
+        self.conn_send = Connection(queue_name=queue_send, durable=True)
         self.end_recv = 0
         self.recv_workers = recv_workers
         signal.signal(signal.SIGTERM, self.exit_gracefully)
@@ -25,8 +25,8 @@ class CommentsFilterStudent:
 
         if "end" in comments:
             self.end_recv += 1
-            if self.end_recv == self.recv_workers:
-                self.conn_send.send(json.dumps(comments))
+            #if self.end_recv == self.recv_workers:
+            self.conn_send.send(json.dumps(comments))
             ch.basic_ack(delivery_tag=method.delivery_tag)
             return
         else:

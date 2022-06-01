@@ -14,20 +14,16 @@ class Client:
         self.chunksize = chunksize
         self.send_workers = send_workers
 
-        self.students_queue = students_queue
-        self.avg_queue = avg_queue
-        self.image_queue = image_queue
         self.students_recved = []
         self.conn_posts = Connection(queue_name=posts_queue)
         self.conn_comments = Connection(queue_name=comments_queue, conn=self.conn_posts)
 
-        self.conn_recv_students = Connection(queue_name=self.students_queue, conn=self.conn_posts)
-        self.conn_recv_avg = Connection(exchange_name=self.avg_queue, bind=True, conn=self.conn_posts)
-        self.conn_recv_image = Connection(queue_name=self.image_queue, conn=self.conn_posts)
+        self.conn_recv_students = Connection(queue_name=students_queue, conn=self.conn_posts)
+        self.conn_recv_avg = Connection(exchange_name=avg_queue, bind=True, conn=self.conn_posts)
+        self.conn_recv_image = Connection(queue_name=image_queue, conn=self.conn_posts)
         self.comments_sender = Process(target=self.__send_comments())
         self.posts_sender = Process(target=self.__send_posts())
         self.sink_recver = Process(target=self.__recv_sinks())
-        
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):
