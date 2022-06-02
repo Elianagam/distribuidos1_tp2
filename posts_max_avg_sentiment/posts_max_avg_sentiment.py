@@ -38,7 +38,6 @@ class PostsMaxAvgSentiment:
     def __end_recv(self, end_msg):
         # Send only post with max avg sentiment
         logging.info(f" --- [POST MAX AVG SENTIMENT] {self.max_avg}")
-        #self.conn_send.send(json.dumps(self.max_avg))
 
         if self.max_avg["url"] != None:
             download = self.__download_image()
@@ -47,10 +46,10 @@ class PostsMaxAvgSentiment:
         self.conn_send.send(json.dumps(end_msg))
 
     def __get_max_avg_sentiment(self, posts):
-        for p in posts:
-            if p["avg_sentiment"] > self.max_avg["avg_sentiment"] \
-                and p["url"][-3:] in ["png", "jpg"]:
-                self.max_avg = p
+        for post in posts:
+            if post["avg_sentiment"] > self.max_avg["avg_sentiment"] \
+                and post["url"][-3:] in ["png", "jpg"]:
+                self.max_avg = post
 
     def __download_image(self):
         import requests 
@@ -60,15 +59,15 @@ class PostsMaxAvgSentiment:
         image_url = self.max_avg["url"]
         filename = "data/max_avg_sentiment.jpg"
 
-        r = requests.get(image_url, stream = True)
-        if r.status_code == 200:
-            r.raw.decode_content = True
-            with open(filename,'wb') as f:
-                shutil.copyfileobj(r.raw, f)
+        response = requests.get(image_url, stream = True)
+        if response.status_code == 200:
+            response.raw.decode_content = True
+            with open(filename,'wb') as file:
+                shutil.copyfileobj(response.raw, file)
             
             with open(filename, "rb") as image:
-                b = bytearray(image.read())
-                encoded = base64.b64encode(b)
+                byte_image = bytearray(image.read())
+                encoded = base64.b64encode(byte_image)
                 data = encoded.decode('ascii')  
                 logging.info(f"[DOWNLOAD_IMAGE] Success {filename}")
                 return {"image_bytes": data}

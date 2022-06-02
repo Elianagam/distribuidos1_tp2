@@ -32,14 +32,14 @@ class PostsAvgSentiment:
 
     def __parser(self, posts):
         list_posts = []
-        for p in posts:
-            sentiments = [float(v) for v in p["sentiments"] if (v != '' and v != None)]
+        for post in posts:
+            sentiments = [float(sentiment) for sentiment in post["sentiments"] if (sentiment != '' and sentiment != None)]
             if len(sentiments) == 0: continue
             post_stm_avg = sum(sentiments) / len(sentiments)
-            p_stm = {
-                "url": p["url"],
+            post_new = {
+                "url": post["url"],
                 "avg_sentiment": post_stm_avg
             }
-            list_posts.append(p_stm)
+            list_posts.append(post_new)
         return list_posts
 

@@ -34,14 +34,14 @@ class CommentsFilterColumns:
 
     def __parser(self, comments):
         filter_comments = []
-        for c in comments:
-            if self.__invalid_body(c): continue
-            cmt = {
-                "post_id": self.__get_post_id(c),
-                "body": c["body"],
-                "sentiment": c["sentiment"],
+        for comment in comments:
+            if self.__invalid_body(comment): continue
+            comment_new = {
+                "post_id": self.__get_post_id(comment),
+                "body": comment["body"],
+                "sentiment": comment["sentiment"],
             }
-            filter_comments.append(cmt)
+            filter_comments.append(comment_new)
 
         #logging.info(f"[COMMENTS FILTER] {len(filter_comments)}")
         self.conn_send.send(json.dumps(filter_comments))

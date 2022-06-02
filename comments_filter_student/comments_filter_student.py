@@ -37,18 +37,17 @@ class CommentsFilterStudent:
 
     def __parser(self, comments):
         student_comments = []
-        for c in comments:
-            if self.__filter_student(c):
-                cmt = {
+        for comment in comments:
+            if self.__filter_student(comment):
+                comment_new = {
                     "url": c["url"],
                     "score": c["score"]
                 }
-                student_comments.append(cmt)
-        #logging.info(f"[STUDENTS FILTER] size={len(student_comments)}")
+                student_comments.append(comment_new)
 
         return student_comments
 
     def __filter_student(self, comment):
-        st = ["university", "college", "student", "teacher", "professor"]
+        student_words = ["university", "college", "student", "teacher", "professor"]
         body =  " ".join(comment["body"])
-        return any(word.lower() in body for word in st)
+        return any(word.lower() in body for word in student_words)

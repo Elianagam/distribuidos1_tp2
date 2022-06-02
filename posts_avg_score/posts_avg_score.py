@@ -38,8 +38,8 @@ class PostsAvgScore:
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __sum_score(self, posts):
-        for p in posts:
-            self.sum_score += p["score"]
+        for post in posts:
+            self.sum_score += post["score"]
             self.count_posts += 1
 
     def __calculate_avg(self):

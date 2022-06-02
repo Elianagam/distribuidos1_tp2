@@ -13,7 +13,6 @@ class PostsFilterScoreGteAvg:
         self.avg_score = None
         self.arrived_early = []
         self.chunksize = chunksize
-        self.total_students = 0
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):
@@ -30,7 +29,6 @@ class PostsFilterScoreGteAvg:
         posts = json.loads(body)
 
         if "end" in posts:
-            logging.info(f" --- [STUDENTS MAX SCORE] TOTAL: {self.total_students}")
             ch.basic_ack(delivery_tag=method.delivery_tag)
             self.conn_send.send(json.dumps(posts))
             return
@@ -38,7 +36,7 @@ class PostsFilterScoreGteAvg:
         if self.avg_score != None:
             self.__parser(posts)
         else:
-            self.arrived_early.append([p for p in posts])
+            self.arrived_early.append([post for post in posts])
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __callback_avg(self, ch, method, properties, body):
@@ -54,10 +52,9 @@ class PostsFilterScoreGteAvg:
 
     def __parser(self, posts):
         list_posts = []
-        for p in posts:
-            if float(p["score"]) >= self.avg_score:
-                list_posts.append({"url": p["url"]})
-                self.total_students += 1
+        for post in posts:
+            if float(post["score"]) >= self.avg_score:
+                list_posts.append({"url": post["url"]})
         if len(list_posts) != 0:
             self.conn_send.send(json.dumps(list_posts))
 
