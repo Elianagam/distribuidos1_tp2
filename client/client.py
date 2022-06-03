@@ -6,12 +6,14 @@ from multiprocessing import Process
 from common.connection import Connection
 
 class Client:
-    def __init__(self, comments_queue, posts_queue, 
-        file_comments, file_posts, chunksize, send_workers):
+    def __init__(self, comments_queue, posts_queue, file_comments, 
+        file_posts, chunksize, send_workers_comments, send_workers_posts):
         self.file_comments = file_comments
         self.file_posts = file_posts
         self.chunksize = chunksize
         self.send_workers = send_workers
+        self.send_workers_comments = send_workers_comments
+        self.send_workers_posts = send_workers_posts
 
         self.conn_posts = Connection(queue_name=posts_queue)
         self.conn_comments = Connection(queue_name=comments_queue, conn=self.conn_posts)
@@ -40,12 +42,18 @@ class Client:
                   "body", "sentiment", "score"]
 
         self.__read(self.file_comments, self.conn_comments, fields)
+        self.__send_end(self.conn_comments, self.send_workers_comments)
 
     def __send_posts(self):
         fields = ["type", "id", "subreddit.id", "subreddit.name", 
                   "subreddit.nsfw", "created_utc", "permalink", 
                   "domain", "url", "selftext", "title", "score"]
         self.__read(self.file_posts, self.conn_posts, fields)
+        self.__send_end(self.conn_posts, self.send_workers_posts)
+
+    def __send_end(self, conn, send_workers):
+        for i in range(send_workers):
+            conn.send(json.dumps({"end": True}))
 
     def __read(self, file_name, conn, fields):
         with open(file_name, mode='r') as csv_file:
@@ -59,7 +67,4 @@ class Client:
             
             if len(chunk) != 0:
                 conn.send(json.dumps(chunk))
-
-        for i in range(self.send_workers):
-            conn.send(json.dumps({"end": True}))
         

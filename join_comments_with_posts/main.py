@@ -16,7 +16,8 @@ def initialize_config():
         config_params["QUEUE_SEND_STUDENTS"] = config["DEFAULT"]['QUEUE_SEND_STUDENTS']
         config_params["QUEUE_SEND_SENTIMENTS"] = config["DEFAULT"]['QUEUE_SEND_SENTIMENTS']
         config_params["CHUNKSIZE"] = int(config["DEFAULT"]['CHUNKSIZE'])
-        config_params["RECV_WORKERS"] = int(config["DEFAULT"]['RECV_WORKERS'])
+        config_params["RECV_WORKERS_COMMENTS"] = int(config["DEFAULT"]['RECV_WORKERS_COMMENTS'])
+        config_params["RECV_WORKERS_POSTS"] = int(config["DEFAULT"]['RECV_WORKERS_POSTS'])
         config_params["SEND_WORKERS"] = int(config["DEFAULT"]['SEND_WORKERS'])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
@@ -38,7 +39,8 @@ def main():
             queue_send_students=config_params["QUEUE_SEND_STUDENTS"],
             queue_send_sentiments=config_params["QUEUE_SEND_SENTIMENTS"],
             chunksize=config_params["CHUNKSIZE"],
-            recv_workers=config_params["RECV_WORKERS"],
+            recv_workers_comments=config_params["RECV_WORKERS_COMMENTS"],
+            recv_workers_posts=config_params["RECV_WORKERS_POSTS"],
             send_workers=config_params["SEND_WORKERS"]
             )
         recver.start()

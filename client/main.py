@@ -16,7 +16,8 @@ def initialize_config():
         config_params["CHUNKSIZE"] = int(config["DEFAULT"]['CHUNKSIZE'])
         config_params["POSTS_QUEUE"] = config["DEFAULT"]['POSTS_QUEUE']
         config_params["COMMETS_QUEUE"] = config["DEFAULT"]['COMMETS_QUEUE']
-        config_params["SEND_WORKERS"] = int(config["DEFAULT"]['SEND_WORKERS'])
+        config_params["SEND_WORKERS_COMMENTS"] = int(config["DEFAULT"]['SEND_WORKERS_COMMENTS'])
+        config_params["SEND_WORKERS_POSTS"] = int(config["DEFAULT"]['SEND_WORKERS_POSTS'])
 
         config_params["STUDENTS_QUEUE"] = config["DEFAULT"]['STUDENTS_QUEUE']
         config_params["AVG_QUEUE"] = config["DEFAULT"]['AVG_QUEUE']
@@ -44,10 +45,8 @@ def main():
             config_params["FILE_COMMETS"],
             config_params["FILE_POSTS"],
             config_params["CHUNKSIZE"],
-            config_params["SEND_WORKERS"],
-            config_params["STUDENTS_QUEUE"],
-            config_params["AVG_QUEUE"],
-            config_params["IMAGE_QUEUE"]
+            config_params["SEND_WORKERS_COMMENTS"],
+            config_params["SEND_WORKERS_POSTS"],
         )
         client.start()
     except (KeyboardInterrupt, SystemExit):

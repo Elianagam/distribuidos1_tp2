@@ -5,12 +5,12 @@
 El script para generar el docker compose pudiendo indicar la cantidad de workers a utilizar para los filtros y para los reducer como tambien la cantidad de datos a enviar en cada chucks se puede correr con el siguiente comando:
 
 ```
-python3 docker_compose.py <num_filters> <num_reducers> <chunksize>
+python3 docker_compose.py <num_reducers> <worker_filter_comments> <worker_filter_posts> <chunksize>
 ```
 
 Ejemplo
 ```
-python3 docker_compose.py 2 2 200
+python3 docker_compose.py 3 2 2 500
 ```
 
 ## Run docker-compose
