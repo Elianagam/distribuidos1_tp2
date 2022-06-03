@@ -29,7 +29,8 @@ class PostsFilterColumns:
             self.conn_send_join.send(json.dumps(posts))
             self.conn_send_avg.send(json.dumps(posts))
             return
-        
+
+        logging.info(f"[COMMENT FILTER RECV] {len(posts)}")
         posts_to_join, posts_for_avg = self.__parser(posts)
 
         self.conn_send_join.send(json.dumps(posts_to_join))

@@ -11,7 +11,6 @@ class Connection:
             self.connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
             self.channel = self.connection.channel()
         else:
-            logging.info(f"[CONECTION] {conn.connection}, {conn.channel}")
             self.connection = conn.connection
             self.channel = conn.channel
 

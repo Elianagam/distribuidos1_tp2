@@ -47,6 +47,9 @@ def main():
             config_params["CHUNKSIZE"],
             config_params["SEND_WORKERS_COMMENTS"],
             config_params["SEND_WORKERS_POSTS"],
+            config_params["STUDENTS_QUEUE"],
+            config_params["AVG_QUEUE"],
+            config_params["IMAGE_QUEUE"],
         )
         client.start()
     except (KeyboardInterrupt, SystemExit):
