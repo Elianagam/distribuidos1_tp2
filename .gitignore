@@ -2,3 +2,4 @@ __pycache__/
 client/comments.csv
 client/posts.csv
 data/*
+posts_max_avg_sentiment/data/*
