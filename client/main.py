@@ -4,25 +4,11 @@ import os
 
 from configparser import ConfigParser
 from client import Client
-
-def initialize_log():
-    """
-    Python custom logging initialization
-    Current timestamp is added to be able to identify in docker
-    compose logs the date when the log has arrived
-    """
-    logging.basicConfig(
-        format='%(asctime)s %(levelname)-8s %(message)s',
-        level='INFO',
-        datefmt='%Y-%m-%d %H:%M:%S',
-    )
+from common.logs import initialize_log
 
 
 def initialize_config():
     config = ConfigParser(os.environ)
-    # If config.ini does not exists original config object is not modified
-    #config.read("config.ini")
-
     config_params = {}
     try:
         config_params["FILE_COMMETS"] = config["DEFAULT"]['FILE_COMMETS']
@@ -30,7 +16,8 @@ def initialize_config():
         config_params["CHUNKSIZE"] = int(config["DEFAULT"]['CHUNKSIZE'])
         config_params["POSTS_QUEUE"] = config["DEFAULT"]['POSTS_QUEUE']
         config_params["COMMETS_QUEUE"] = config["DEFAULT"]['COMMETS_QUEUE']
-        config_params["SEND_WORKERS"] = int(config["DEFAULT"]['SEND_WORKERS'])
+        config_params["SEND_WORKERS_COMMENTS"] = int(config["DEFAULT"]['SEND_WORKERS_COMMENTS'])
+        config_params["SEND_WORKERS_POSTS"] = int(config["DEFAULT"]['SEND_WORKERS_POSTS'])
 
         config_params["STUDENTS_QUEUE"] = config["DEFAULT"]['STUDENTS_QUEUE']
         config_params["AVG_QUEUE"] = config["DEFAULT"]['AVG_QUEUE']
@@ -39,7 +26,6 @@ def initialize_config():
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
         raise ValueError("Key could not be parsed. Error: {}. Aborting server".format(e))
-
     return config_params
 
 
@@ -59,14 +45,15 @@ def main():
             config_params["FILE_COMMETS"],
             config_params["FILE_POSTS"],
             config_params["CHUNKSIZE"],
-            config_params["SEND_WORKERS"],
+            config_params["SEND_WORKERS_COMMENTS"],
+            config_params["SEND_WORKERS_POSTS"],
             config_params["STUDENTS_QUEUE"],
             config_params["AVG_QUEUE"],
-            config_params["IMAGE_QUEUE"]
+            config_params["IMAGE_QUEUE"],
         )
         client.start()
-    except (KeyboardInterrupt, SystemExit):
-        logging.info(f"[MAIN_CLIENT] Stop event is set")
+    except Exception as e:
+        logging.info(f"Close Connection")
 
 
 if __name__ == "__main__":
