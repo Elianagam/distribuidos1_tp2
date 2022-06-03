@@ -52,17 +52,14 @@ class Client:
         logging.info(f"* * * [CLIENT RECV END STUDENT] {sink_recv}")
         
         if "end" in sink_recv:
-            ch.basic_ack(delivery_tag=method.delivery_tag)
             return
         for student in sink_recv:
             self.students_recved.append(student)
         
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __callback(self, ch, method, properties, body):
         sink_recv = json.loads(body)
         logging.info(f"* * * [CLIENT RECV] {sink_recv.keys()}")
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __send_comments(self):
         fields = ["type","id", "subreddit.id", "subreddit.name",
