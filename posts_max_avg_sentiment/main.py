@@ -3,25 +3,11 @@ import os
 
 from configparser import ConfigParser
 from posts_max_avg_sentiment import PostsMaxAvgSentiment
-
-def initialize_log():
-    """
-    Python custom logging initialization
-    Current timestamp is added to be able to identify in docker
-    compose logs the date when the log has arrived
-    """
-    logging.basicConfig(
-        format='%(asctime)s %(levelname)-8s %(message)s',
-        level='INFO',
-        datefmt='%Y-%m-%d %H:%M:%S',
-    )
+from common.logs import initialize_log
 
 
 def initialize_config():
     config = ConfigParser(os.environ)
-    # If config.ini does not exists original config object is not modified
-    #config.read("config.ini")
-
     config_params = {}
     try:
         config_params["QUEUE_RECV"] = config["DEFAULT"]['QUEUE_RECV']
@@ -31,7 +17,6 @@ def initialize_config():
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
         raise ValueError("Key could not be parsed. Error: {}. Aborting server".format(e))
-
     return config_params
 
 
@@ -48,9 +33,8 @@ def main():
             config_params["RECV_WORKERS"],
         )
         recver.start()
-    except (KeyboardInterrupt, SystemExit):
-        logging.info(f"[MAIN_COMMENTS] Stop event is set")
-
+    except Exception as e:
+        logging.info(f"Close Connection")
 
 if __name__ == "__main__":
     main()

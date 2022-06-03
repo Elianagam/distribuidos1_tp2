@@ -28,28 +28,29 @@ class PostsFilterColumns:
             logging.info(f"[POSTS_RECV] END")
             self.conn_send_join.send(json.dumps(posts))
             self.conn_send_avg.send(json.dumps(posts))
-            ch.basic_ack(delivery_tag=method.delivery_tag)
             return
-        
-        self.__parser(posts)
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+
+        logging.info(f"[COMMENT FILTER RECV] {len(posts)}")
+        posts_to_join, posts_for_avg = self.__parser(posts)
+
+        self.conn_send_join.send(json.dumps(posts_to_join))
+        self.conn_send_avg.send(json.dumps(posts_for_avg))
 
     def __parser(self, posts):
         posts_to_join = []
         posts_for_avg = []
-        for p in posts:
-            if self.__invalid_post(p):
+        for post in posts:
+            if self.__invalid_post(post):
                 continue
             else:
-                post = {"score": float(p["score"])}
-                posts_for_avg.append(post)
+                post_new = {"score": float(post["score"])}
+                posts_for_avg.append(post_new)
                 
-                post["post_id"] = p["id"]
-                post["url"] = p["url"]
-                posts_to_join.append(post)
+                post_new["post_id"] = post["id"]
+                post_new["url"] = post["url"]
+                posts_to_join.append(post_new)
 
-        self.conn_send_join.send(json.dumps(posts_to_join))
-        self.conn_send_avg.send(json.dumps(posts_for_avg))
+        return posts_to_join, posts_for_avg
         
 
     def __invalid_post(self, post):

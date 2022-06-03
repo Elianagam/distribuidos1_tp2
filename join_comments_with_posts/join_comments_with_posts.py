@@ -8,17 +8,18 @@ from common.connection import Connection
 
 class JoinCommentsWithPosts:
     def __init__(self, queue_recv_comments, queue_recv_post, queue_send_students, 
-            queue_send_sentiments, chunksize, recv_workers, send_workers):
+            queue_send_sentiments, chunksize, recv_workers_comments, recv_workers_posts, send_workers):
         self.conn_recv_pst = Connection(queue_name=queue_recv_post)
         self.conn_recv_cmt = Connection(queue_name=queue_recv_comments, conn=self.conn_recv_pst)
 
-        self.conn_send_st = Connection(queue_name=queue_send_students, durable=True)
-        self.conn_send_se = Connection(queue_name=queue_send_sentiments, durable=True)
+        self.conn_send_st = Connection(queue_name=queue_send_students)
+        self.conn_send_se = Connection(queue_name=queue_send_sentiments)
         self.join_dict = {}
         self.chunksize = chunksize
         self.finish = {"posts": 0, "comments": 0}
         signal.signal(signal.SIGTERM, self.exit_gracefully)
-        self.recv_workers = recv_workers
+        self.recv_workers_comments = recv_workers_comments
+        self.recv_workers_posts = recv_workers_posts
         self.send_workers = send_workers
 
     def exit_gracefully(self, *args):
@@ -34,29 +35,29 @@ class JoinCommentsWithPosts:
     def __callback_recv_comments(self, ch, method, properties, body):
         comments = json.loads(body)
 
-        if self.__finish(my_key="comments", other_key="posts", readed=comments):
-            ch.basic_ack(delivery_tag=method.delivery_tag)
+        if self.__finish(my_key="comments", other_key="posts", readed=comments,
+            my_workers=self.recv_workers_comments,
+            other_workers=self.recv_workers_posts):
             return
 
         self.__add_comments(comments)
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __callback_recv_posts(self, ch, method, properties, body):
         posts = json.loads(body)
 
-        if self.__finish(my_key="posts", other_key="comments", readed=posts):
-            ch.basic_ack(delivery_tag=method.delivery_tag)
+        if self.__finish(my_key="posts", other_key="comments", readed=posts,
+            my_workers=self.recv_workers_posts,
+            other_workers=self.recv_workers_comments):
             return
 
         self.__add_post(posts)
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
-    def __finish(self, my_key, other_key, readed):
+    def __finish(self, my_key, other_key, readed, my_workers, other_workers):
         if "end" in readed:
             self.finish[my_key] += 1
-            logging.info(f"[FINISH JOIN ALL?] {self.finish} | Workers: {self.recv_workers}")
-            if self.finish[other_key] == self.recv_workers \
-                and self.finish[my_key] == self.recv_workers:
+            logging.info(f"""[FINISH JOIN ALL?] {self.finish} | Comments_w: {self.recv_workers_comments} - Posts_w: {self.recv_workers_posts}""")
+            if self.finish[other_key] == other_workers \
+                and self.finish[my_key] == my_workers:
                 self.__send_join_data()
                 # Send end msg to n workers
                 for i in range(self.send_workers):

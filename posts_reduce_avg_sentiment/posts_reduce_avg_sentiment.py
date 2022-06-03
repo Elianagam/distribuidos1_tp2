@@ -6,7 +6,7 @@ from common.connection import Connection
 
 class PostsAvgSentiment:
     def __init__(self, queue_recv, queue_send):
-        self.conn_recv = Connection(queue_name=queue_recv, durable=True)
+        self.conn_recv = Connection(queue_name=queue_recv)
         self.conn_send = Connection(queue_name=queue_send)
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
@@ -19,12 +19,10 @@ class PostsAvgSentiment:
 
         if "end" in posts:
             self.conn_send.send(json.dumps(posts))
-            ch.basic_ack(delivery_tag=method.delivery_tag)
             return
 
         result = self.__parser(posts)
         self.conn_send.send(json.dumps(result))
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def start(self):
         self.conn_recv.recv(self.__callback)
@@ -32,14 +30,14 @@ class PostsAvgSentiment:
 
     def __parser(self, posts):
         list_posts = []
-        for p in posts:
-            sentiments = [float(v) for v in p["sentiments"] if (v != '' and v != None)]
+        for post in posts:
+            sentiments = [float(sentiment) for sentiment in post["sentiments"] if (sentiment != '' and sentiment != None)]
             if len(sentiments) == 0: continue
             post_stm_avg = sum(sentiments) / len(sentiments)
-            p_stm = {
-                "url": p["url"],
+            post_new = {
+                "url": post["url"],
                 "avg_sentiment": post_stm_avg
             }
-            list_posts.append(p_stm)
+            list_posts.append(post_new)
         return list_posts
 

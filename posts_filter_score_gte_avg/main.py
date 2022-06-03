@@ -4,25 +4,11 @@ import os
 
 from configparser import ConfigParser
 from posts_filter_score_gte_avg import PostsFilterScoreGteAvg
-
-def initialize_log():
-    """
-    Python custom logging initialization
-    Current timestamp is added to be able to identify in docker
-    compose logs the date when the log has arrived
-    """
-    logging.basicConfig(
-        format='%(asctime)s %(levelname)-8s %(message)s',
-        level='INFO',
-        datefmt='%Y-%m-%d %H:%M:%S',
-    )
+from common.logs import initialize_log
 
 
 def initialize_config():
     config = ConfigParser(os.environ)
-    # If config.ini does not exists original config object is not modified
-    #config.read("config.ini")
-
     config_params = {}
     try:
         config_params["QUEUE_RECV_AVG"] = config["DEFAULT"]['QUEUE_RECV_AVG']
@@ -51,8 +37,8 @@ def main():
             config_params["CHUNKSIZE"]
         )
         recver.start()
-    except (KeyboardInterrupt, SystemExit):
-        logging.info(f"[MAIN_COMMENTS] Stop event is set")
+    except Exception as e:
+        logging.info(f"Close Connection")
 
 
 if __name__ == "__main__":

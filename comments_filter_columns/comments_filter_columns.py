@@ -26,25 +26,24 @@ class CommentsFilterColumns:
         if "end" in comments:
             logging.info(f"[COMMENTS_RECV] END")
             self.conn_send.send(json.dumps(comments))
-            ch.basic_ack(delivery_tag=method.delivery_tag)
             return
 
-        self.__parser(comments)
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+        logging.info(f"[COMMENT FILTER RECV] {len(comments)}")
+        filter_comments = self.__parser(comments)
+        self.conn_send.send(json.dumps(filter_comments))
 
     def __parser(self, comments):
         filter_comments = []
-        for c in comments:
-            if self.__invalid_body(c): continue
-            cmt = {
-                "post_id": self.__get_post_id(c),
-                "body": c["body"],
-                "sentiment": c["sentiment"],
+        for comment in comments:
+            if self.__invalid_body(comment): continue
+            comment_new = {
+                "post_id": self.__get_post_id(comment),
+                "body": comment["body"],
+                "sentiment": comment["sentiment"],
             }
-            filter_comments.append(cmt)
+            filter_comments.append(comment_new)
 
-        #logging.info(f"[COMMENTS FILTER] {len(filter_comments)}")
-        self.conn_send.send(json.dumps(filter_comments))
+        return filter_comments
 
     def __invalid_body(self, comment):
         return len(comment["body"]) == 0 or comment["body"] == "[removed]"
@@ -54,5 +53,4 @@ class CommentsFilterColumns:
             rgx = r'https://old.reddit.com/r/meirl/comments/([^/]+)/me.*'
             return re.findall(rgx, comment["permalink"])[0]
         except Exception as e:
-            #logging.error(f"[FILTER_POST_ID] ERROR {e} ")
             return ''

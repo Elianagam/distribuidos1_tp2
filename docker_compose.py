@@ -27,7 +27,8 @@ services:
       - FILE_POSTS=/data/posts.csv
       - COMMETS_QUEUE=comments_queue 
       - POSTS_QUEUE=posts_queue
-      - SEND_WORKERS={}
+      - SEND_WORKERS_COMMENTS={}
+      - SEND_WORKERS_POSTS={}
       - STUDENTS_QUEUE=student_url_queue
       - AVG_QUEUE=posts_avg_score_queue
       - IMAGE_QUEUE=post_avg_sentiments_queue
@@ -84,7 +85,8 @@ services:
       - QUEUE_SEND_STUDENTS=cmt_pst_join_st_queue
       - QUEUE_SEND_SENTIMENTS=cmt_pst_join_se_queue
       - CHUNKSIZE={}
-      - RECV_WORKERS={}
+      - RECV_WORKERS_COMMENTS={}
+      - RECV_WORKERS_POSTS={}
       - SEND_WORKERS={}
 """
 
@@ -168,25 +170,30 @@ REDUCE_SENTIMETS = """
 """
 
 def main():
-    filters = int(sys.argv[1])
-    filter_exchange = int(sys.argv[2])
-    chunksize = int(sys.argv[3])
+    filter_exchange = int(sys.argv[1])
+    workers_join_comments = int(sys.argv[2])
+    workers_join_posts = int(sys.argv[3])
+    chunksize = int(sys.argv[4])
 
     filters_c = ""
     filters_p = ""
-    for i in range(1,filters+1):
+    for i in range(1,workers_join_comments+1):
         filters_c += COMENTS_FILTERS.format(i, i)
+
+    for i in range(1,workers_join_posts+1):
         filters_p += POSTS_FILTER.format(i, i)
     
     filters_s = ""
     filters_ss = ""
     reduce_se = ""
     for x in range(1,filter_exchange+1):
-        filters_s += FILTER_STUDENTS.format(x, x, x)
+        filters_s += FILTER_STUDENTS.format(x, x, filter_exchange)
         filters_ss += FILTER_SCORE_STUDENTS.format(x, x, chunksize)
         reduce_se += REDUCE_SENTIMETS.format(x,x)
 
-    compose = INIT_DOCKER.format(chunksize, filters, filter_exchange, filters, chunksize, filters, filter_exchange) \
+    compose = INIT_DOCKER.format(chunksize, workers_join_comments, workers_join_posts,
+      filter_exchange, workers_join_posts, chunksize, workers_join_comments, 
+      workers_join_posts, filter_exchange) \
                   .replace("<COMMENTS_FILTER_COLUMNS>", filters_c) \
                   .replace("<COMMENTS_FILTER_STUDENTS>", filters_s) \
                   .replace("<POST_FILTER_SCORE_GTE_AVG>", filters_ss) \

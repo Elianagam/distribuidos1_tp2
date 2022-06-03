@@ -7,7 +7,7 @@ import json
 class Connection:
     def __init__(self, queue_name='', exchange_name='', bind=False, conn=None, durable=False):
         if not conn:
-            time.sleep(20)
+            time.sleep(15)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
             self.channel = self.connection.channel()
         else:
@@ -15,7 +15,7 @@ class Connection:
             self.channel = conn.channel
 
         self.queue_name = queue_name
-        self.exchange_name = exchange_name # durable=True
+        self.exchange_name = exchange_name
         self.__declare(bind, durable)
 
     def __declare(self, bind, durable):
@@ -50,7 +50,7 @@ class Connection:
         self.channel.basic_consume(
             queue=self.queue_name,
             on_message_callback=callback,
-            #auto_ack=auto_ack
+            auto_ack=True
         )
         if start_consuming:
             self.channel.start_consuming()
