@@ -6,13 +6,12 @@ from common.connection import Connection
 
 
 class PostsAvgScore:
-    def __init__(self, queue_recv, queue_send, recv_workers, send_workers):
+    def __init__(self, queue_recv, queue_send, recv_workers):
         self.conn_recv = Connection(queue_name=queue_recv)
         self.conn_send = Connection(exchange_name=queue_send)
         self.count_posts = 0 
         self.sum_score = 0
         self.recv_workers = recv_workers
-        self.send_workers = send_workers
         self.end_recv = 0
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 

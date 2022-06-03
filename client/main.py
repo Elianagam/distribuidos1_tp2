@@ -54,6 +54,8 @@ def main():
         client.start()
     except (KeyboardInterrupt, SystemExit):
         logging.info(f"[MAIN_CLIENT] Stop event is set")
+    except Exception as e:
+        logging.error(f"ERROR {e}")
 
 
 if __name__ == "__main__":

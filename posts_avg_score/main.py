@@ -14,7 +14,6 @@ def initialize_config():
         config_params["QUEUE_RECV"] = config["DEFAULT"]['QUEUE_RECV']
         config_params["QUEUE_SEND"] = config["DEFAULT"]['QUEUE_SEND']
         config_params["RECV_WORKERS"] = int(config["DEFAULT"]['RECV_WORKERS'])
-        config_params["SEND_WORKERS"] = int(config["DEFAULT"]['SEND_WORKERS'])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -32,12 +31,13 @@ def main():
         recver = PostsAvgScore(
             config_params["QUEUE_RECV"],
             config_params["QUEUE_SEND"],
-            config_params["RECV_WORKERS"],
-            config_params["SEND_WORKERS"],
+            config_params["RECV_WORKERS"]
         )
         recver.start()
     except (KeyboardInterrupt, SystemExit):
         logging.info(f"[MAIN_COMMENTS] Stop event is set")
+    except Exception as e:
+        logging.error(f"ERROR {e}")
 
 
 if __name__ == "__main__":

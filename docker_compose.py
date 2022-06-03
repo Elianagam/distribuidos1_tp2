@@ -69,7 +69,6 @@ services:
       - QUEUE_RECV=posts_for_avg_queue
       - QUEUE_SEND=posts_avg_score_queue
       - RECV_WORKERS={}
-      - SEND_WORKERS={}
 
   join_comments_with_posts:
     container_name: join_comments_with_posts
@@ -193,7 +192,7 @@ def main():
         reduce_se += REDUCE_SENTIMETS.format(x,x)
 
     compose = INIT_DOCKER.format(chunksize, workers_join_comments, workers_join_posts,
-      filter_exchange, workers_join_posts, filter_exchange, chunksize, workers_join_comments, 
+      filter_exchange, workers_join_posts, chunksize, workers_join_comments, 
       workers_join_posts, filter_exchange) \
                   .replace("<COMMENTS_FILTER_COLUMNS>", filters_c) \
                   .replace("<COMMENTS_FILTER_STUDENTS>", filters_s) \
