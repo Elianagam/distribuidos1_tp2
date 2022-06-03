@@ -5,6 +5,8 @@ import json
 from multiprocessing import Process
 from common.connection import Connection
 
+SINK_TO_RECV = 3
+
 class Client:
     def __init__(self, comments_queue, posts_queue, file_comments, 
         file_posts, chunksize, send_workers_comments, send_workers_posts,
@@ -16,18 +18,21 @@ class Client:
         self.send_workers_posts = send_workers_posts
 
         self.students_recved = []
+        self.count_end = 0
         self.conn_posts = Connection(queue_name=posts_queue)
         self.conn_comments = Connection(queue_name=comments_queue, conn=self.conn_posts)
 
         self.conn_recv_students = Connection(queue_name=students_queue, conn=self.conn_posts)
         self.conn_recv_avg = Connection(exchange_name=avg_queue, bind=True, conn=self.conn_posts)
         self.conn_recv_image = Connection(queue_name=image_queue, conn=self.conn_posts)
+        
         self.comments_sender = Process(target=self.__send_comments())
         self.posts_sender = Process(target=self.__send_posts())
         self.sink_recver = Process(target=self.__recv_sinks())
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):
+        logging.info(f"CLOSE RECV CLIENT")
         self.conn_posts.close()
 
     def start(self):
@@ -40,26 +45,31 @@ class Client:
         self.comments_sender.join()
         self.posts_sender.join()
         self.sink_recver.join()
-        self.exit_gracefully()
-
+        
     def __recv_sinks(self):
         self.conn_recv_students.recv(self.__callback_students, start_consuming=False)
         self.conn_recv_avg.recv(self.__callback, start_consuming=False)
         self.conn_recv_image.recv(self.__callback)
+        
 
     def __callback_students(self, ch, method, properties, body):
         sink_recv = json.loads(body)
-        logging.info(f"* * * [CLIENT RECV END STUDENT] {sink_recv}")
         
         if "end" in sink_recv:
+            self.count_end += 1
             return
         for student in sink_recv:
+            logging.info(f"* * * [CLIENT RECV END STUDENT] {sink_recv}")
             self.students_recved.append(student)
         
 
     def __callback(self, ch, method, properties, body):
         sink_recv = json.loads(body)
-        logging.info(f"* * * [CLIENT RECV] {sink_recv.keys()}")
+        if "end" in sink_recv:
+            self.count_end += 1
+            return
+        else:
+            logging.info(f"* * * [CLIENT RECV] {sink_recv.keys()}")
 
     def __send_comments(self):
         fields = ["type","id", "subreddit.id", "subreddit.name",

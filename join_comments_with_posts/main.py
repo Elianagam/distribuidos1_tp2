@@ -44,11 +44,8 @@ def main():
             send_workers=config_params["SEND_WORKERS"]
             )
         recver.start()
-    except (KeyboardInterrupt, SystemExit):
-        logging.info(f"[MAIN_COMMENTS] Stop event is set")
     except Exception as e:
-        logging.error(f"ERROR {e}")
-
+        logging.info(f"Close Connection")
 
 if __name__ == "__main__":
     main()

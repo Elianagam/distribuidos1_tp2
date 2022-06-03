@@ -12,8 +12,8 @@ class JoinCommentsWithPosts:
         self.conn_recv_pst = Connection(queue_name=queue_recv_post)
         self.conn_recv_cmt = Connection(queue_name=queue_recv_comments, conn=self.conn_recv_pst)
 
-        self.conn_send_st = Connection(queue_name=queue_send_students, durable=True)
-        self.conn_send_se = Connection(queue_name=queue_send_sentiments, durable=True)
+        self.conn_send_st = Connection(queue_name=queue_send_students)
+        self.conn_send_se = Connection(queue_name=queue_send_sentiments)
         self.join_dict = {}
         self.chunksize = chunksize
         self.finish = {"posts": 0, "comments": 0}
@@ -55,8 +55,7 @@ class JoinCommentsWithPosts:
     def __finish(self, my_key, other_key, readed, my_workers, other_workers):
         if "end" in readed:
             self.finish[my_key] += 1
-            logging.info(f"""[FINISH JOIN ALL?] {self.finish} | 
-                Comments_w: {self.recv_workers_comments} - Posts_w: {self.recv_workers_posts}""")
+            logging.info(f"""[FINISH JOIN ALL?] {self.finish} | Comments_w: {self.recv_workers_comments} - Posts_w: {self.recv_workers_posts}""")
             if self.finish[other_key] == other_workers \
                 and self.finish[my_key] == my_workers:
                 self.__send_join_data()
