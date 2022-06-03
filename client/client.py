@@ -14,8 +14,8 @@ class Client:
         self.chunksize = chunksize
         self.send_workers = send_workers
 
-        self.conn_posts = Connection(queue_name=posts_queue, durable=True)
-        self.conn_comments = Connection(queue_name=comments_queue, durable=True, conn=self.conn_posts)
+        self.conn_posts = Connection(queue_name=posts_queue)
+        self.conn_comments = Connection(queue_name=comments_queue, conn=self.conn_posts)
 
         self.comments_sender = Process(target=self.__send_comments())
         self.posts_sender = Process(target=self.__send_posts())

@@ -29,7 +29,11 @@ class PostsAvgScore:
         if "end" in posts:
             self.end_recv += 1
             if self.end_recv == self.recv_workers:
-                self.__calculate_avg()
+                avg = self.__calculate_avg()
+                
+                # TODO NO ENVIAR DOBLE
+                self.conn_send.send(json.dumps({"posts_score_avg": avg}))
+                self.conn_send.send(json.dumps({"posts_score_avg": avg}))
                 self.conn_send.send(json.dumps(posts))
             ch.basic_ack(delivery_tag=method.delivery_tag)
             return
@@ -48,5 +52,4 @@ class PostsAvgScore:
         avg = self.sum_score / self.count_posts
         
         logging.info(f" --- [POST_SCORE_AVG] {avg}")
-        self.conn_send.send(json.dumps({"posts_score_avg": avg}))
-        self.conn_send.send(json.dumps({"posts_score_avg": avg}))
+        

@@ -8,7 +8,7 @@ from common.connection import Connection
 
 class CommentsFilterColumns:
     def __init__(self, queue_recv, queue_send):
-        self.conn_recv = Connection(queue_name=queue_recv, durable=True)
+        self.conn_recv = Connection(queue_name=queue_recv)
         self.conn_send = Connection(queue_name=queue_send)
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
@@ -29,7 +29,9 @@ class CommentsFilterColumns:
             ch.basic_ack(delivery_tag=method.delivery_tag)
             return
 
-        self.__parser(comments)
+        filter_comments = self.__parser(comments)
+        self.conn_send.send(json.dumps(filter_comments))
+
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __parser(self, comments):
@@ -43,8 +45,7 @@ class CommentsFilterColumns:
             }
             filter_comments.append(comment_new)
 
-        #logging.info(f"[COMMENTS FILTER] {len(filter_comments)}")
-        self.conn_send.send(json.dumps(filter_comments))
+        return filter_comments
 
     def __invalid_body(self, comment):
         return len(comment["body"]) == 0 or comment["body"] == "[removed]"
