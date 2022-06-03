@@ -5,7 +5,7 @@ import json
 
 
 class Connection:
-    def __init__(self, queue_name='', exchange_name='', bind=False, conn=None, durable=False):
+    def __init__(self, queue_name='', exchange_name='', bind=False, conn=None, durable=False, exchange_type='fanout'):
         if not conn:
             time.sleep(15)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
@@ -16,16 +16,16 @@ class Connection:
 
         self.queue_name = queue_name
         self.exchange_name = exchange_name
-        self.__declare(bind, durable)
+        self.__declare(bind, durable, exchange_type)
 
-    def __declare(self, bind, durable):
+    def __declare(self, bind, durable, exchange_type):
         if self.queue_name != '':
             self.channel.queue_declare(queue=self.queue_name, durable=durable)
 
         if self.exchange_name != '':
             self.channel.exchange_declare(
                 exchange=self.exchange_name,
-                exchange_type='fanout'
+                exchange_type=exchange_type
         )
         if bind:
             # Si es exgange que recibe tiene que crear una anon queue 
