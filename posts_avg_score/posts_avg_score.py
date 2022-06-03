@@ -33,7 +33,6 @@ class PostsAvgScore:
                 
                 # TODO NO ENVIAR DOBLE
                 self.conn_send.send(json.dumps({"posts_score_avg": avg}))
-                self.conn_send.send(json.dumps({"posts_score_avg": avg}))
                 self.conn_send.send(json.dumps(posts))
             ch.basic_ack(delivery_tag=method.delivery_tag)
             return
