@@ -9,9 +9,6 @@ from common.logs import initialize_log
 
 def initialize_config():
     config = ConfigParser(os.environ)
-    # If config.ini does not exists original config object is not modified
-    #config.read("config.ini")
-
     config_params = {}
     try:
         config_params["FILE_COMMETS"] = config["DEFAULT"]['FILE_COMMETS']
@@ -28,7 +25,6 @@ def initialize_config():
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
         raise ValueError("Key could not be parsed. Error: {}. Aborting server".format(e))
-
     return config_params
 
 

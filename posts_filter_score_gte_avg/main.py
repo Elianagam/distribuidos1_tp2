@@ -9,9 +9,6 @@ from common.logs import initialize_log
 
 def initialize_config():
     config = ConfigParser(os.environ)
-    # If config.ini does not exists original config object is not modified
-    #config.read("config.ini")
-
     config_params = {}
     try:
         config_params["QUEUE_RECV_AVG"] = config["DEFAULT"]['QUEUE_RECV_AVG']

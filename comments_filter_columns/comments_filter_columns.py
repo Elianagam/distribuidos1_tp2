@@ -55,5 +55,4 @@ class CommentsFilterColumns:
             rgx = r'https://old.reddit.com/r/meirl/comments/([^/]+)/me.*'
             return re.findall(rgx, comment["permalink"])[0]
         except Exception as e:
-            #logging.error(f"[FILTER_POST_ID] ERROR {e} ")
             return ''

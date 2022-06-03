@@ -7,8 +7,7 @@ from common.connection import Connection
 
 class Client:
     def __init__(self, comments_queue, posts_queue, 
-        file_comments, file_posts, chunksize, send_workers,
-        students_queue, avg_queue, image_queue):
+        file_comments, file_posts, chunksize, send_workers):
         self.file_comments = file_comments
         self.file_posts = file_posts
         self.chunksize = chunksize
@@ -61,7 +60,6 @@ class Client:
             if len(chunk) != 0:
                 conn.send(json.dumps(chunk))
 
-        # send empty when finish
         for i in range(self.send_workers):
             conn.send(json.dumps({"end": True}))
         

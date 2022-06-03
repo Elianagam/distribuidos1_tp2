@@ -16,7 +16,7 @@ class Connection:
             self.channel = conn.channel
 
         self.queue_name = queue_name
-        self.exchange_name = exchange_name # durable=True
+        self.exchange_name = exchange_name
         self.__declare(bind, durable)
 
     def __declare(self, bind, durable):
@@ -50,8 +50,7 @@ class Connection:
         self.channel.basic_qos(prefetch_count=1)
         self.channel.basic_consume(
             queue=self.queue_name,
-            on_message_callback=callback,
-            #auto_ack=True
+            on_message_callback=callback
         )
         if start_consuming:
             self.channel.start_consuming()
