@@ -19,8 +19,8 @@ class Client:
 
         self.students_recved = []
         self.count_end = 0
-        self.conn_posts = Connection(queue_name=posts_queue)
-        self.conn_comments = Connection(queue_name=comments_queue, conn=self.conn_posts)
+        self.conn_posts = Connection(queue_name=posts_queue, durable=True)
+        self.conn_comments = Connection(queue_name=comments_queue, conn=self.conn_posts, durable=True)
 
         self.conn_recv_students = Connection(queue_name=students_queue, conn=self.conn_posts)
         self.conn_recv_avg = Connection(exchange_name=avg_queue, bind=True, conn=self.conn_posts)

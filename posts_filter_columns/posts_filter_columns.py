@@ -7,9 +7,9 @@ from common.connection import Connection
 
 class PostsFilterColumns:
     def __init__(self, queue_recv, queue_send_to_join, queue_send_to_avg):
-        self.conn_recv = Connection(queue_name=queue_recv)
-        self.conn_send_join = Connection(queue_name=queue_send_to_join)
-        self.conn_send_avg = Connection(queue_name=queue_send_to_avg)
+        self.conn_recv = Connection(queue_name=queue_recv, durable=True)
+        self.conn_send_join = Connection(queue_name=queue_send_to_join, durable=True)
+        self.conn_send_avg = Connection(queue_name=queue_send_to_avg, durable=True)
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):

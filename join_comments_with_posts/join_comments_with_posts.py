@@ -9,11 +9,11 @@ from common.connection import Connection
 class JoinCommentsWithPosts:
     def __init__(self, queue_recv_comments, queue_recv_post, queue_send_students, 
             queue_send_sentiments, chunksize, recv_workers_comments, recv_workers_posts, send_workers):
-        self.conn_recv_pst = Connection(queue_name=queue_recv_post)
-        self.conn_recv_cmt = Connection(queue_name=queue_recv_comments, conn=self.conn_recv_pst)
+        self.conn_recv_pst = Connection(queue_name=queue_recv_post, durable=True)
+        self.conn_recv_cmt = Connection(queue_name=queue_recv_comments, durable=True, conn=self.conn_recv_pst)
 
-        self.conn_send_st = Connection(queue_name=queue_send_students)
-        self.conn_send_se = Connection(queue_name=queue_send_sentiments)
+        self.conn_send_st = Connection(queue_name=queue_send_students, durable=True)
+        self.conn_send_se = Connection(queue_name=queue_send_sentiments, durable=True)
         self.join_dict = {}
         self.chunksize = chunksize
         self.finish = {"posts": 0, "comments": 0}

@@ -7,7 +7,7 @@ from common.connection import Connection
 
 class PostsMaxAvgSentiment:
     def __init__(self, queue_recv, queue_send, recv_workers):
-        self.conn_recv = Connection(queue_name=queue_recv)
+        self.conn_recv = Connection(queue_name=queue_recv, durable=True)
         self.conn_send = Connection(queue_name=queue_send)
         self.max_avg = {"url": None, "avg_sentiment": 0}
         self.recv_workers = recv_workers
