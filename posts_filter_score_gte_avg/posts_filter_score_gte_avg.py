@@ -8,7 +8,7 @@ from common.connection import Connection
 class PostsFilterScoreGteAvg:
     def __init__(self, queue_recv_avg, queue_recv_students, queue_send, chunksize=10):
         self.conn_recv_students = Connection(queue_name=queue_recv_students, durable=True)
-        self.conn_recv_avg = Connection(exchange_name=queue_recv_avg, bind=True, conn=self.conn_recv_students)
+        self.conn_recv_avg = Connection(queue_name=queue_recv_avg, durable=True, conn=self.conn_recv_students)
         self.conn_send = Connection(queue_name=queue_send)
         self.avg_score = None
         self.arrived_early = []
@@ -29,7 +29,6 @@ class PostsFilterScoreGteAvg:
         posts = json.loads(body)
 
         if "end" in posts:
-            ch.basic_ack(delivery_tag=method.delivery_tag)
             self.conn_send.send(json.dumps(posts))
             return
 
@@ -37,18 +36,15 @@ class PostsFilterScoreGteAvg:
             self.__parser(posts)
         else:
             self.arrived_early.append([post for post in posts])
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __callback_avg(self, ch, method, properties, body):
         avg = json.loads(body)
         if "end" in avg:
             logging.info(f"[AVG END] {self.avg_score}")
             self.__send_arrive_early()
-            ch.basic_ack(delivery_tag=method.delivery_tag)
             return
 
         self.avg_score = float(avg["posts_score_avg"])
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __parser(self, posts):
         list_posts = []

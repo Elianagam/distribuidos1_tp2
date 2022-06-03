@@ -29,11 +29,9 @@ class PostsMaxAvgSentiment:
             self.end_recv += 1
             if self.end_recv == self.recv_workers:
                 self.__end_recv(posts)
-            ch.basic_ack(delivery_tag=method.delivery_tag)
             return
         else:
             self.__get_max_avg_sentiment(posts)
-            ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __end_recv(self, end_msg):
         # Send only post with max avg sentiment

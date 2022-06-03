@@ -71,7 +71,7 @@ services:
     environment:
       - QUEUE_RECV=cmt_pst_join_st_queue
       - QUEUE_SEND=posts_student_queue
-      - RECV_WORKERS=3
+      - RECV_WORKERS=2
 
   comments_filter_student_2:
     container_name: comments_filter_student_2
@@ -85,21 +85,7 @@ services:
     environment:
       - QUEUE_RECV=cmt_pst_join_st_queue
       - QUEUE_SEND=posts_student_queue
-      - RECV_WORKERS=3
-
-  comments_filter_student_3:
-    container_name: comments_filter_student_3
-    image: comments_filter_student:latest
-    entrypoint: python3 /main.py
-    restart: on-failure
-    depends_on:
-      - rabbitmq
-    links: 
-      - rabbitmq
-    environment:
-      - QUEUE_RECV=cmt_pst_join_st_queue
-      - QUEUE_SEND=posts_student_queue
-      - RECV_WORKERS=3
+      - RECV_WORKERS=2
 
   
   posts_filter_score_gte_avg_1:
@@ -119,21 +105,6 @@ services:
 
   posts_filter_score_gte_avg_2:
     container_name: posts_filter_score_gte_avg_2
-    image: posts_filter_score_gte_avg:latest
-    entrypoint: python3 /main.py
-    restart: on-failure
-    depends_on:
-      - rabbitmq
-    links: 
-      - rabbitmq
-    environment:
-      - QUEUE_RECV_AVG=posts_avg_score_queue
-      - QUEUE_RECV_STUDENTS=posts_student_queue
-      - QUEUE_SEND=student_url_queue
-      - CHUNKSIZE=10
-
-  posts_filter_score_gte_avg_3:
-    container_name: posts_filter_score_gte_avg_3
     image: posts_filter_score_gte_avg:latest
     entrypoint: python3 /main.py
     restart: on-failure
@@ -174,19 +145,6 @@ services:
       - QUEUE_RECV=cmt_pst_join_se_queue
       - QUEUE_SEND=post_sentiments_queue
 
-  posts_reduce_avg_sentiment_3:
-    container_name: posts_reduce_avg_sentiment_3
-    image: posts_reduce_avg_sentiment:latest
-    entrypoint: python3 /main.py
-    restart: on-failure
-    depends_on:
-      - rabbitmq
-    links: 
-      - rabbitmq
-    environment:
-      - QUEUE_RECV=cmt_pst_join_se_queue
-      - QUEUE_SEND=post_sentiments_queue
-
 
   posts_max_avg_sentiment:
     container_name: posts_max_avg_sentiment
@@ -202,7 +160,7 @@ services:
     environment:
       - QUEUE_RECV=post_sentiments_queue
       - QUEUE_SEND=post_avg_sentiments_queue
-      - RECV_WORKERS=3
+      - RECV_WORKERS=2
 
   
   posts_filter_columns_1:
@@ -265,4 +223,4 @@ services:
       - CHUNKSIZE=10
       - RECV_WORKERS_COMMENTS=2
       - RECV_WORKERS_POSTS=2
-      - SEND_WORKERS=3
+      - SEND_WORKERS=2

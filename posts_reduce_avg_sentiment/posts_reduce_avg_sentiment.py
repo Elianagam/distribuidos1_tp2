@@ -19,12 +19,10 @@ class PostsAvgSentiment:
 
         if "end" in posts:
             self.conn_send.send(json.dumps(posts))
-            ch.basic_ack(delivery_tag=method.delivery_tag)
             return
 
         result = self.__parser(posts)
         self.conn_send.send(json.dumps(result))
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def start(self):
         self.conn_recv.recv(self.__callback)

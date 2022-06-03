@@ -26,13 +26,10 @@ class CommentsFilterColumns:
         if "end" in comments:
             logging.info(f"[COMMENTS_RECV] END")
             self.conn_send.send(json.dumps(comments))
-            ch.basic_ack(delivery_tag=method.delivery_tag)
             return
 
         filter_comments = self.__parser(comments)
         self.conn_send.send(json.dumps(filter_comments))
-
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __parser(self, comments):
         filter_comments = []

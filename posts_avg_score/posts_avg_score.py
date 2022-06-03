@@ -8,7 +8,7 @@ from common.connection import Connection
 class PostsAvgScore:
     def __init__(self, queue_recv, queue_send, recv_workers):
         self.conn_recv = Connection(queue_name=queue_recv)
-        self.conn_send = Connection(exchange_name=queue_send)
+        self.conn_send = Connection(queue_name=queue_send, durable=True)
         self.count_posts = 0 
         self.sum_score = 0
         self.recv_workers = recv_workers
@@ -33,11 +33,9 @@ class PostsAvgScore:
                 
                 self.conn_send.send(json.dumps({"posts_score_avg": avg}))
                 self.conn_send.send(json.dumps(posts))
-            ch.basic_ack(delivery_tag=method.delivery_tag)
             return
         else:
             self.__sum_score(posts)
-            ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __sum_score(self, posts):
         for post in posts:

@@ -38,11 +38,9 @@ class JoinCommentsWithPosts:
         if self.__finish(my_key="comments", other_key="posts", readed=comments,
             my_workers=self.recv_workers_comments,
             other_workers=self.recv_workers_posts):
-            ch.basic_ack(delivery_tag=method.delivery_tag)
             return
 
         self.__add_comments(comments)
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __callback_recv_posts(self, ch, method, properties, body):
         posts = json.loads(body)
@@ -50,11 +48,9 @@ class JoinCommentsWithPosts:
         if self.__finish(my_key="posts", other_key="comments", readed=posts,
             my_workers=self.recv_workers_posts,
             other_workers=self.recv_workers_comments):
-            ch.basic_ack(delivery_tag=method.delivery_tag)
             return
 
         self.__add_post(posts)
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __finish(self, my_key, other_key, readed, my_workers, other_workers):
         if "end" in readed:

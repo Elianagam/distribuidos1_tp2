@@ -11,7 +11,6 @@ class Client:
         self.file_comments = file_comments
         self.file_posts = file_posts
         self.chunksize = chunksize
-        self.send_workers = send_workers
         self.send_workers_comments = send_workers_comments
         self.send_workers_posts = send_workers_posts
 

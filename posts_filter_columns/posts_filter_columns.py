@@ -28,15 +28,12 @@ class PostsFilterColumns:
             logging.info(f"[POSTS_RECV] END")
             self.conn_send_join.send(json.dumps(posts))
             self.conn_send_avg.send(json.dumps(posts))
-            ch.basic_ack(delivery_tag=method.delivery_tag)
             return
         
         posts_to_join, posts_for_avg = self.__parser(posts)
 
         self.conn_send_join.send(json.dumps(posts_to_join))
         self.conn_send_avg.send(json.dumps(posts_for_avg))
-
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __parser(self, posts):
         posts_to_join = []
@@ -45,7 +42,7 @@ class PostsFilterColumns:
             if self.__invalid_post(post):
                 continue
             else:
-                post_new = {"score": float(p["score"])}
+                post_new = {"score": float(post["score"])}
                 posts_for_avg.append(post_new)
                 
                 post_new["post_id"] = post["id"]
