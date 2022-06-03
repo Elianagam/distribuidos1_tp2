@@ -8,7 +8,7 @@ from common.connection import Connection
 
 class CommentsFilterColumns:
     def __init__(self, queue_recv, queue_send):
-        self.conn_recv = Connection(queue_name=queue_recv, durable=True)
+        self.conn_recv = Connection(queue_name=queue_recv)
         self.conn_send = Connection(queue_name=queue_send)
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 

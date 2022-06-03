@@ -22,7 +22,7 @@ class JoinCommentsWithPosts:
         self.send_workers = send_workers
 
     def exit_gracefully(self, *args):
-        self.conn_recv_cmt.close()
+        self.conn_recv_pst.close()
         self.conn_send_st.close()
         self.conn_send_se.close()
 

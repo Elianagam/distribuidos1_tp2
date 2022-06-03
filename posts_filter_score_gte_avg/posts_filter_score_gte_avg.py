@@ -23,7 +23,6 @@ class PostsFilterScoreGteAvg:
     def start(self):
         self.conn_recv_avg.recv(self.__callback_avg, start_consuming=False)
         self.conn_recv_students.recv(self.__callback_students)
-        
         self.exit_gracefully()
 
     def __callback_students(self, ch, method, properties, body):
@@ -55,10 +54,12 @@ class PostsFilterScoreGteAvg:
     def __parser(self, posts):
         list_posts = []
         for p in posts:
+            logging.info(f"[posts] {p}")
             if float(p["score"]) >= self.avg_score:
                 list_posts.append({"url": p["url"]})
                 self.total_students += 1
         if len(list_posts) != 0:
+            logging.info(f"[STUDENT TO SEND] {list_posts}")
             self.conn_send.send(json.dumps(list_posts))
 
     def __send_arrive_early(self):
@@ -66,4 +67,5 @@ class PostsFilterScoreGteAvg:
         lst = self.arrived_early
         chunks = [lst[i:i + n] for i in range(0, len(lst), n)]
         for chunk in chunks:
+            logging.info(f"[chunks] {chunks}")
             self.__parser(chunk)
