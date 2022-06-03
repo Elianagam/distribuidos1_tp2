@@ -9,7 +9,6 @@ class CommentsFilterStudent:
     def __init__(self, queue_recv, queue_send, recv_workers):
         self.conn_recv = Connection(queue_name=queue_recv, durable=True)
         self.conn_send = Connection(queue_name=queue_send, durable=True)
-        self.end_recv = 0
         self.recv_workers = recv_workers
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
@@ -24,7 +23,6 @@ class CommentsFilterStudent:
         comments = json.loads(body)
 
         if "end" in comments:
-            self.end_recv += 1
             self.conn_send.send(json.dumps(comments))
             return
         else:
@@ -40,7 +38,7 @@ class CommentsFilterStudent:
                     "score": comment["score"]
                 }
                 student_comments.append(comment_new)
-
+        logging.info(f"[STUDENTS TO SEND] {len(student_comments)}")
         return student_comments
 
     def __filter_student(self, comment):

@@ -20,7 +20,7 @@ class Client:
         self.conn_comments = Connection(queue_name=comments_queue, conn=self.conn_posts)
 
         self.conn_recv_students = Connection(queue_name=students_queue, conn=self.conn_posts)
-        self.conn_recv_avg = Connection(queue_name=avg_queue, durable=True, conn=self.conn_posts)
+        self.conn_recv_avg = Connection(exchange_name=avg_queue, bind=True, conn=self.conn_posts)
         self.conn_recv_image = Connection(queue_name=image_queue, conn=self.conn_posts)
         self.comments_sender = Process(target=self.__send_comments())
         self.posts_sender = Process(target=self.__send_posts())

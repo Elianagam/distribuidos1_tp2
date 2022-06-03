@@ -26,11 +26,11 @@ class PostsFilterScoreGteAvg:
 
     def __callback_students(self, ch, method, properties, body):
         posts = json.loads(body)
-
         if "end" in posts:
             self.conn_send.send(json.dumps(posts))
             return
 
+        logging.info(f"[STUDENT FILTER SCORE] {len(posts)}")
         if self.avg_score != None:
             self.__parser(posts)
         else:
@@ -44,6 +44,7 @@ class PostsFilterScoreGteAvg:
             self.__send_arrive_early()
             return
         if "posts_score_avg" in avg:
+            logging.info(f"[STUDENT FILTER SCORE] RECV AVG={avg}")
             self.avg_score = float(avg["posts_score_avg"])
 
     def __parser(self, posts):
