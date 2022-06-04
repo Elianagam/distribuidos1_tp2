@@ -5,7 +5,7 @@ import json
 
 
 class Connection:
-    def __init__(self, queue_name='', exchange_name='', bind=False, conn=None, durable=False, exchange_type='fanout'):
+    def __init__(self, queue_name='', exchange_name='', bind=False, conn=None, durable=True, exchange_type='fanout'):
         if not conn:
             time.sleep(15)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))

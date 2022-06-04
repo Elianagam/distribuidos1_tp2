@@ -5,6 +5,7 @@ import json
 from multiprocessing import Process
 from common.connection import Connection
 
+
 SINK_TO_RECV = 3
 
 class Client:
@@ -18,9 +19,8 @@ class Client:
         self.send_workers_posts = send_workers_posts
 
         self.students_recved = []
-        self.count_end = 0
-        self.conn_posts = Connection(queue_name=posts_queue, durable=True)
-        self.conn_comments = Connection(queue_name=comments_queue, conn=self.conn_posts, durable=True)
+        self.conn_posts = Connection(queue_name=posts_queue)
+        self.conn_comments = Connection(queue_name=comments_queue, conn=self.conn_posts)
 
         self.conn_recv_students = Connection(queue_name=students_queue, conn=self.conn_posts)
         self.conn_recv_avg = Connection(exchange_name=avg_queue, bind=True, conn=self.conn_posts)
@@ -56,7 +56,6 @@ class Client:
         sink_recv = json.loads(body)
         
         if "end" in sink_recv:
-            self.count_end += 1
             return
         for student in sink_recv:
             logging.info(f"* * * [CLIENT RECV END STUDENT] {sink_recv}")
@@ -66,7 +65,6 @@ class Client:
     def __callback(self, ch, method, properties, body):
         sink_recv = json.loads(body)
         if "end" in sink_recv:
-            self.count_end += 1
             return
         else:
             logging.info(f"* * * [CLIENT RECV] {sink_recv.keys()}")
