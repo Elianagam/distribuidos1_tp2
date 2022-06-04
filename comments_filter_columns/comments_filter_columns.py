@@ -7,9 +7,12 @@ from common.connection import Connection
 
 
 class CommentsFilterColumns:
-    def __init__(self, queue_recv, queue_send):
-        self.conn_recv = Connection(queue_name=queue_recv, durable=True)
-        self.conn_send = Connection(queue_name=queue_send, durable=True)
+    def __init__(self, queue_recv, queue_send, worker_key):
+        self.worker_key = f"worker.num{worker_key}"
+        
+        self.conn_recv = Connection(exchange_name=queue_recv, bind=True, 
+            exchange_type='topic', routing_key=self.worker_key)
+        self.conn_send = Connection(queue_name=queue_send)
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):

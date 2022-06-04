@@ -103,6 +103,7 @@ COMENTS_FILTERS = """
     environment:
       - QUEUE_RECV=comments_queue
       - QUEUE_SEND=comments_filter_queue
+      - WORKER_KEY={}
 """
 
 FILTER_STUDENTS = """
@@ -152,6 +153,7 @@ POSTS_FILTER = """
       - QUEUE_RECV=posts_queue
       - QUEUE_SEND_JOIN=posts_for_join_queue
       - QUEUE_SEND_AVG=posts_for_avg_queue
+      - WORKER_KEY={}
 """
 
 REDUCE_SENTIMETS = """
@@ -178,10 +180,10 @@ def main():
     filters_c = ""
     filters_p = ""
     for i in range(1,workers_join_comments+1):
-        filters_c += COMENTS_FILTERS.format(i, i)
+        filters_c += COMENTS_FILTERS.format(i, i, i)
 
     for i in range(1,workers_join_posts+1):
-        filters_p += POSTS_FILTER.format(i, i)
+        filters_p += POSTS_FILTER.format(i, i, i)
     
     filters_s = ""
     filters_ss = ""

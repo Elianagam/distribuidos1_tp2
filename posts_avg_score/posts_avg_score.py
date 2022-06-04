@@ -7,7 +7,7 @@ from common.connection import Connection
 
 class PostsAvgScore:
     def __init__(self, queue_recv, queue_send, recv_workers):
-        self.conn_recv = Connection(queue_name=queue_recv, durable=True)
+        self.conn_recv = Connection(queue_name=queue_recv)
         self.conn_send = Connection(exchange_name=queue_send)
         self.count_posts = 0 
         self.sum_score = 0
