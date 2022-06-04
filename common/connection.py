@@ -5,7 +5,7 @@ import json
 
 
 class Connection:
-    def __init__(self, queue_name='', exchange_name='', bind=False, conn=None, durable=True, exchange_type='fanout'):
+    def __init__(self, queue_name='', exchange_name='', bind=False, conn=None, exchange_type='fanout', routing_key=''):
         if not conn:
             time.sleep(15)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
@@ -16,11 +16,11 @@ class Connection:
 
         self.queue_name = queue_name
         self.exchange_name = exchange_name
-        self.__declare(bind, durable, exchange_type)
+        self.__declare(bind, exchange_type, routing_key)
 
-    def __declare(self, bind, durable, exchange_type):
+    def __declare(self, bind, exchange_type, routing_key):
         if self.queue_name != '':
-            self.channel.queue_declare(queue=self.queue_name, durable=durable)
+            self.channel.queue_declare(queue=self.queue_name, durable=True)
 
         if self.exchange_name != '':
             self.channel.exchange_declare(
@@ -31,16 +31,25 @@ class Connection:
             # Si es exgange que recibe tiene que crear una anon queue 
             anon_queue = self.channel.queue_declare(queue='', exclusive=True)
             self.queue_name = anon_queue.method.queue
+            if routing_key:
+                self.channel.queue_bind(
+                    exchange=self.exchange_name,
+                    queue=self.queue_name,
+                    routing_key=routing_key # consume some msgs
+                )
+            else:
+                self.channel.queue_bind(
+                    exchange=self.exchange_name,
+                    queue=self.queue_name,
+                )
 
-            self.channel.queue_bind(
-                exchange=self.exchange_name,
-                queue=self.queue_name
-        )
+    def send(self, body, routing_key=None):
+        if routing_key == None:
+            routing_key = self.queue_name
 
-    def send(self, body):
         self.channel.basic_publish(
             exchange=self.exchange_name,
-            routing_key=self.queue_name,
+            routing_key=routing_key, #self.queue_name, #
             body=body,
             properties=pika.BasicProperties(delivery_mode=2)  #  message persistent
         )

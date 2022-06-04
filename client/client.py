@@ -19,12 +19,12 @@ class Client:
         self.send_workers_posts = send_workers_posts
 
         self.students_recved = []
-        self.conn_posts = Connection(queue_name=posts_queue)
-        self.conn_comments = Connection(queue_name=comments_queue, conn=self.conn_posts)
+        self.conn_posts = Connection(exchange_name=posts_queue, exchange_type='topic')
+        self.conn_comments = Connection(exchange_name=comments_queue, exchange_type='topic')
 
-        self.conn_recv_students = Connection(queue_name=students_queue, conn=self.conn_posts)
-        self.conn_recv_avg = Connection(exchange_name=avg_queue, bind=True, conn=self.conn_posts)
-        self.conn_recv_image = Connection(queue_name=image_queue, conn=self.conn_posts)
+        self.conn_recv_students = Connection(queue_name=students_queue)
+        self.conn_recv_avg = Connection(exchange_name=avg_queue, bind=True, conn=self.conn_recv_students)
+        self.conn_recv_image = Connection(queue_name=image_queue, conn=self.conn_recv_students)
         
         self.comments_sender = Process(target=self.__send_comments())
         self.posts_sender = Process(target=self.__send_posts())
@@ -38,9 +38,9 @@ class Client:
     def start(self):
         logging.info(f"[CLIENT] started...")
 
-        self.comments_sender.start()
-        self.posts_sender.start()
-        self.sink_recver.start()
+        self.posts_sender.run()
+        self.comments_sender.run()
+        self.sink_recver.run()
 
         self.comments_sender.join()
         self.posts_sender.join()
@@ -74,30 +74,42 @@ class Client:
                   "subreddit.nsfw", "created_utc", "permalink", 
                   "body", "sentiment", "score"]
 
-        self.__read(self.file_comments, self.conn_comments, fields)
+        self.__read(self.file_comments, self.conn_comments, fields, self.send_workers_comments)
         self.__send_end(self.conn_comments, self.send_workers_comments)
 
     def __send_posts(self):
         fields = ["type", "id", "subreddit.id", "subreddit.name", 
                   "subreddit.nsfw", "created_utc", "permalink", 
                   "domain", "url", "selftext", "title", "score"]
-        self.__read(self.file_posts, self.conn_posts, fields)
+
+        self.__read(self.file_posts, self.conn_posts, fields, self.send_workers_posts)
         self.__send_end(self.conn_posts, self.send_workers_posts)
 
     def __send_end(self, conn, send_workers):
         for i in range(send_workers):
-            conn.send(json.dumps({"end": True}))
+            worker_key = self.__get_routing_key(i, send_workers)
+            logging.info(f"[WORKER_KEY END] {worker_key}")
+            conn.send(json.dumps({"end": True}), routing_key=worker_key)
 
-    def __read(self, file_name, conn, fields):
+    def __get_routing_key(self, num, send_workers):
+        return f"worker.num{(num % send_workers) + 1}"
+
+    def __read(self, file_name, conn, fields, send_workers):
         with open(file_name, mode='r') as csv_file:
             reader = csv.DictReader(csv_file)
             chunk = []
+            count = 0
             for i, line in enumerate(reader):
                 if (i % self.chunksize == 0 and i > 0):
-                    conn.send(json.dumps(chunk))
+                    worker_key = self.__get_routing_key(count, send_workers)
+                    logging.info(f"[READ CLIENT] {file_name} {len(chunk)} {worker_key}")
+                    conn.send(body=json.dumps(chunk), routing_key=worker_key)
                     chunk = []
+                    count += 1
                 chunk.append(line)
             
             if len(chunk) != 0:
-                conn.send(json.dumps(chunk))
+                worker_key = self.__get_routing_key(count, send_workers)
+                logging.info(f"[READ CLIENT] {file_name} {len(chunk)} {worker_key}")
+                conn.send(body=json.dumps(chunk), routing_key=worker_key)
         

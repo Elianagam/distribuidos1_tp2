@@ -14,6 +14,7 @@ def initialize_config():
         config_params["QUEUE_RECV"] = config["DEFAULT"]['QUEUE_RECV']
         config_params["QUEUE_SEND_JOIN"] = config["DEFAULT"]['QUEUE_SEND_JOIN']
         config_params["QUEUE_SEND_AVG"] = config["DEFAULT"]['QUEUE_SEND_AVG']
+        config_params["WORKER_KEY"] = int(config["DEFAULT"]['WORKER_KEY'])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -31,8 +32,9 @@ def main():
         recver = PostsFilterColumns(
             queue_recv=config_params["QUEUE_RECV"],
             queue_send_to_join=config_params["QUEUE_SEND_JOIN"],
-            queue_send_to_avg=config_params["QUEUE_SEND_AVG"]
-            )
+            queue_send_to_avg=config_params["QUEUE_SEND_AVG"],
+            worker_key=config_params["WORKER_KEY"]
+        )
         recver.start()
     except Exception as e:
         logging.info(f"Close Connection")
