@@ -14,6 +14,7 @@ def initialize_config():
         config_params["QUEUE_RECV"] = config["DEFAULT"]['QUEUE_RECV']
         config_params["QUEUE_SEND"] = config["DEFAULT"]['QUEUE_SEND']
         config_params["RECV_WORKERS"] = int(config["DEFAULT"]['RECV_WORKERS'])
+        config_params["WORKER_KEY"] = int(config["DEFAULT"]['WORKER_KEY'])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -31,7 +32,8 @@ def main():
         recver = CommentsFilterStudent(
             config_params["QUEUE_RECV"],
             config_params["QUEUE_SEND"],
-            config_params["RECV_WORKERS"]
+            config_params["RECV_WORKERS"],
+            config_params["WORKER_KEY"]
         )
         recver.start()
     except Exception as e:

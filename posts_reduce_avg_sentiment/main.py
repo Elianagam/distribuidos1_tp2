@@ -13,6 +13,7 @@ def initialize_config():
     try:
         config_params["QUEUE_RECV"] = config["DEFAULT"]['QUEUE_RECV']
         config_params["QUEUE_SEND"] = config["DEFAULT"]['QUEUE_SEND']
+        config_params["WORKER_KEY"] = int(config["DEFAULT"]['WORKER_KEY'])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -27,7 +28,11 @@ def main():
 
         logging.info("Server configuration: {}".format(config_params))
 
-        recver = PostsAvgSentiment(config_params["QUEUE_RECV"], config_params["QUEUE_SEND"])
+        recver = PostsAvgSentiment(
+            config_params["QUEUE_RECV"],
+            config_params["QUEUE_SEND"],
+            config_params["WORKER_KEY"]
+        )
         recver.start()
     except Exception as e:
         logging.info(f"Close Connection")

@@ -82,8 +82,7 @@ services:
     environment:
       - QUEUE_RECV_COMMENTS=comments_filter_queue
       - QUEUE_RECV_POSTS=posts_for_join_queue
-      - QUEUE_SEND_STUDENTS=cmt_pst_join_st_queue
-      - QUEUE_SEND_SENTIMENTS=cmt_pst_join_se_queue
+      - QUEUE_SEND=cmt_pst_join_queue
       - CHUNKSIZE={}
       - RECV_WORKERS_COMMENTS={}
       - RECV_WORKERS_POSTS={}
@@ -117,9 +116,10 @@ FILTER_STUDENTS = """
     links: 
       - rabbitmq
     environment:
-      - QUEUE_RECV=cmt_pst_join_st_queue
+      - QUEUE_RECV=cmt_pst_join_queue
       - QUEUE_SEND=posts_student_queue
       - RECV_WORKERS={}
+      - WORKER_KEY={}
 """
 
 FILTER_SCORE_STUDENTS = """
@@ -137,6 +137,7 @@ FILTER_SCORE_STUDENTS = """
       - QUEUE_RECV_STUDENTS=posts_student_queue
       - QUEUE_SEND=student_url_queue
       - CHUNKSIZE={}
+      - WORKER_KEY={}
 """
 
 POSTS_FILTER = """
@@ -167,8 +168,9 @@ REDUCE_SENTIMETS = """
     links: 
       - rabbitmq
     environment:
-      - QUEUE_RECV=cmt_pst_join_se_queue
+      - QUEUE_RECV=cmt_pst_join_queue
       - QUEUE_SEND=post_sentiments_queue
+      - WORKER_KEY={}
 """
 
 def main():
@@ -189,9 +191,9 @@ def main():
     filters_ss = ""
     reduce_se = ""
     for x in range(1,filter_exchange+1):
-        filters_s += FILTER_STUDENTS.format(x, x, filter_exchange)
-        filters_ss += FILTER_SCORE_STUDENTS.format(x, x, chunksize)
-        reduce_se += REDUCE_SENTIMETS.format(x,x)
+        filters_s += FILTER_STUDENTS.format(x, x, filter_exchange, x)
+        filters_ss += FILTER_SCORE_STUDENTS.format(x, x, chunksize, x)
+        reduce_se += REDUCE_SENTIMETS.format(x, x, x)
 
     compose = INIT_DOCKER.format(chunksize, workers_join_comments, workers_join_posts,
       filter_exchange, workers_join_posts, chunksize, workers_join_comments, 

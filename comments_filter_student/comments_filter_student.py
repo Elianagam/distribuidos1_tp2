@@ -6,9 +6,11 @@ from common.connection import Connection
 
 
 class CommentsFilterStudent:
-    def __init__(self, queue_recv, queue_send, recv_workers):
-        self.conn_recv = Connection(queue_name=queue_recv)
-        self.conn_send = Connection(queue_name=queue_send)
+    def __init__(self, queue_recv, queue_send, recv_workers, worker_key):
+        self.worker_key = f"worker.student.num{worker_key}"
+        self.conn_recv = Connection(exchange_name=queue_recv, bind=True, 
+            exchange_type='topic', routing_key=self.worker_key)
+        self.conn_send = Connection(exchange_name=queue_send, exchange_type='topic')
         self.recv_workers = recv_workers
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
@@ -23,11 +25,14 @@ class CommentsFilterStudent:
         comments = json.loads(body)
 
         if "end" in comments:
-            self.conn_send.send(json.dumps(comments))
+            self.__send_data(comments)
             return
         else:
             result = self.__parser(comments)
-            self.conn_send.send(json.dumps(result))
+            self.__send_data(result)
+
+    def __send_data(self, data):
+        self.conn_send.send(json.dumps(data), routing_key=self.worker_key)
 
     def __parser(self, comments):
         student_comments = []
@@ -38,7 +43,6 @@ class CommentsFilterStudent:
                     "score": comment["score"]
                 }
                 student_comments.append(comment_new)
-        logging.info(f"[STUDENTS TO SEND] {len(student_comments)}")
         return student_comments
 
     def __filter_student(self, comment):
