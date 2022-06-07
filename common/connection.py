@@ -71,4 +71,5 @@ class Connection:
     def get_connection():
         return self.connection, self.channel
 
-
+    def stop(self):
+        self.channel.stop_consuming()
