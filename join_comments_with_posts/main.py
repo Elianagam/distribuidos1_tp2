@@ -18,10 +18,10 @@ def main():
             queue_recv_post=config_params["QUEUE_RECV_POSTS"],
             queue_send_students=config_params["QUEUE_SEND_STUDENTS"],
             queue_send_sentiments=config_params["QUEUE_SEND_SENTIMENTS"],
-            chunksize=config_params["CHUNKSIZE"],
-            recv_workers_comments=config_params["RECV_WORKERS_COMMENTS"],
-            recv_workers_posts=config_params["RECV_WORKERS_POSTS"],
-            send_workers=config_params["SEND_WORKERS"]
+            chunksize=int(config_params["CHUNKSIZE"]),
+            recv_workers_comments=int(config_params["RECV_WORKERS_COMMENTS"]),
+            recv_workers_posts=int(config_params["RECV_WORKERS_POSTS"]),
+            send_workers=int(config_params["SEND_WORKERS"])
             )
         recver.start()
     except Exception as e:

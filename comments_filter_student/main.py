@@ -14,7 +14,7 @@ def main():
         recver = CommentsFilterStudent(
             config_params["QUEUE_RECV"],
             config_params["QUEUE_SEND"],
-            config_params["RECV_WORKERS"]
+            int(config_params["RECV_WORKERS"])
         )
         recver.start()
     except Exception as e:

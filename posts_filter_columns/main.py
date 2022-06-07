@@ -16,7 +16,7 @@ def main():
             queue_recv=config_params["QUEUE_RECV"],
             queue_send_to_join=config_params["QUEUE_SEND_JOIN"],
             queue_send_to_avg=config_params["QUEUE_SEND_AVG"],
-            worker_key=config_params["WORKER_KEY"]
+            worker_key=int(config_params["WORKER_KEY"])
         )
         recver.start()
     except Exception as e:

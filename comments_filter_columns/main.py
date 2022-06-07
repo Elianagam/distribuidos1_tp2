@@ -14,7 +14,7 @@ def main():
         recver = CommentsFilterColumns(
             config_params["QUEUE_RECV"],
             config_params["QUEUE_SEND"],
-            config_params["WORKER_KEY"]
+            int(config_params["WORKER_KEY"])
         )
         recver.start()
     except Exception as e:

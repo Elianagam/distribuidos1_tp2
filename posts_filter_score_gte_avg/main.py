@@ -16,7 +16,7 @@ def main():
             config_params["QUEUE_RECV_AVG"],
             config_params["QUEUE_RECV_STUDENTS"],
             config_params["QUEUE_SEND"],
-            config_params["CHUNKSIZE"]
+            int(config_params["CHUNKSIZE"])
         )
         recver.start()
     except Exception as e:
