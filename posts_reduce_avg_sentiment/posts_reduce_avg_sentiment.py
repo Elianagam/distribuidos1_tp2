@@ -5,8 +5,10 @@ import json
 from common.connection import Connection
 
 class PostsAvgSentiment:
-    def __init__(self, queue_recv, queue_send):
-        self.conn_recv = Connection(queue_name=queue_recv)
+    def __init__(self, queue_recv, queue_send, worker_key):
+        self.worker_key = f"worker.sentiment.num{worker_key}"
+        self.conn_recv = Connection(exchange_name=queue_recv, bind=True, 
+            exchange_type='topic', routing_key=self.worker_key)
         self.conn_send = Connection(queue_name=queue_send)
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
@@ -39,5 +41,6 @@ class PostsAvgSentiment:
                 "avg_sentiment": post_stm_avg
             }
             list_posts.append(post_new)
+
         return list_posts
 

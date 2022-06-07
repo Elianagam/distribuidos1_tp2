@@ -49,7 +49,7 @@ class Connection:
 
         self.channel.basic_publish(
             exchange=self.exchange_name,
-            routing_key=routing_key, #self.queue_name, #
+            routing_key=routing_key,
             body=body,
             properties=pika.BasicProperties(delivery_mode=2)  #  message persistent
         )

@@ -24,7 +24,6 @@ class PostsMaxAvgSentiment:
 
     def __callback(self, ch, method, properties, body):
         posts = json.loads(body)
-
         if "end" in posts:
             self.end_recv += 1
             if self.end_recv == self.recv_workers:
@@ -40,8 +39,6 @@ class PostsMaxAvgSentiment:
         if self.max_avg["url"] != None:
             download = self.__download_image()
             self.conn_send.send(json.dumps(download))
-
-        #self.conn_send.send(json.dumps(end_msg))
 
     def __get_max_avg_sentiment(self, posts):
         for post in posts:

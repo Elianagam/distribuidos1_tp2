@@ -34,6 +34,8 @@ class Client:
     def exit_gracefully(self, *args):
         logging.info(f"CLOSE RECV CLIENT")
         self.conn_posts.close()
+        self.conn_comments.close()
+        self.conn_recv_students.close()
 
     def start(self):
         logging.info(f"[CLIENT] started...")
@@ -45,6 +47,7 @@ class Client:
         self.comments_sender.join()
         self.posts_sender.join()
         self.sink_recver.join()
+        self.exit_gracefully()
         
     def __recv_sinks(self):
         self.conn_recv_students.recv(self.__callback_students, start_consuming=False)

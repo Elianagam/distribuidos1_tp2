@@ -7,13 +7,12 @@ from common.connection import Connection
 
 
 class JoinCommentsWithPosts:
-    def __init__(self, queue_recv_comments, queue_recv_post, queue_send_students, 
-            queue_send_sentiments, chunksize, recv_workers_comments, recv_workers_posts, send_workers):
+    def __init__(self, queue_recv_comments, queue_recv_post, queue_send, 
+            chunksize, recv_workers_comments, recv_workers_posts, send_workers):
         self.conn_recv_pst = Connection(queue_name=queue_recv_post)
         self.conn_recv_cmt = Connection(queue_name=queue_recv_comments, conn=self.conn_recv_pst)
 
-        self.conn_send_st = Connection(queue_name=queue_send_students)
-        self.conn_send_se = Connection(queue_name=queue_send_sentiments)
+        self.conn_send = Connection(exchange_name=queue_send, exchange_type='topic')
         self.join_dict = {}
         self.chunksize = chunksize
         self.finish = {"posts": 0, "comments": 0}
@@ -24,8 +23,7 @@ class JoinCommentsWithPosts:
 
     def exit_gracefully(self, *args):
         self.conn_recv_pst.close()
-        self.conn_send_st.close()
-        self.conn_send_se.close()
+        self.conn_send.close()
 
     def start(self):
         self.conn_recv_cmt.recv(self.__callback_recv_comments, start_consuming=False)
@@ -61,13 +59,16 @@ class JoinCommentsWithPosts:
                 self.__send_join_data()
                 # Send end msg to n workers
                 for i in range(self.send_workers):
-                    self.__send_data(readed)
+                    self.__send_data(readed, i)
             return True
         return False
 
-    def __send_data(self, data):
-        self.conn_send_st.send(json.dumps(data))
-        self.conn_send_se.send(json.dumps(data))
+    def __send_data(self, data, count):
+        num = (count % self.send_workers) + 1
+        worker_key_se = f"worker.sentiment.num{num}"
+        worker_key_st = f"worker.student.num{num}"
+        self.conn_send.send(json.dumps(data), routing_key=worker_key_st)
+        self.conn_send.send(json.dumps(data), routing_key=worker_key_se)
 
     def __add_comments(self, list_comments):
         for c in list_comments:
@@ -93,16 +94,18 @@ class JoinCommentsWithPosts:
 
     def __send_join_data(self):
         chunk = []
+        count = 0
         for post_id, post in self.join_dict.items():
             if not "url" in self.join_dict[post_id]:
                 continue
             if len(chunk) == self.chunksize:
-                self.__send_data(chunk)
+                self.__send_data(chunk, count)
                 chunk = []
+                count +=1
             
             chunk.append(post)
 
         # send last data in chunk
         if len(chunk) > 0:
-            self.__send_data(chunk)
+            self.__send_data(chunk, count)
 

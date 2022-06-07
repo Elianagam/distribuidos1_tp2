@@ -71,9 +71,10 @@ services:
     links: 
       - rabbitmq
     environment:
-      - QUEUE_RECV=cmt_pst_join_st_queue
+      - QUEUE_RECV=cmt_pst_join_queue
       - QUEUE_SEND=posts_student_queue
       - RECV_WORKERS=2
+      - WORKER_KEY=1
 
   comments_filter_student_2:
     container_name: comments_filter_student_2
@@ -85,9 +86,10 @@ services:
     links: 
       - rabbitmq
     environment:
-      - QUEUE_RECV=cmt_pst_join_st_queue
+      - QUEUE_RECV=cmt_pst_join_queue
       - QUEUE_SEND=posts_student_queue
       - RECV_WORKERS=2
+      - WORKER_KEY=2
 
   
   posts_filter_score_gte_avg_1:
@@ -104,6 +106,7 @@ services:
       - QUEUE_RECV_STUDENTS=posts_student_queue
       - QUEUE_SEND=student_url_queue
       - CHUNKSIZE=400
+      - WORKER_KEY=1
 
   posts_filter_score_gte_avg_2:
     container_name: posts_filter_score_gte_avg_2
@@ -119,6 +122,7 @@ services:
       - QUEUE_RECV_STUDENTS=posts_student_queue
       - QUEUE_SEND=student_url_queue
       - CHUNKSIZE=400
+      - WORKER_KEY=2
 
   
   posts_reduce_avg_sentiment_1:
@@ -131,8 +135,9 @@ services:
     links: 
       - rabbitmq
     environment:
-      - QUEUE_RECV=cmt_pst_join_se_queue
+      - QUEUE_RECV=cmt_pst_join_queue
       - QUEUE_SEND=post_sentiments_queue
+      - WORKER_KEY=1
 
   posts_reduce_avg_sentiment_2:
     container_name: posts_reduce_avg_sentiment_2
@@ -144,8 +149,9 @@ services:
     links: 
       - rabbitmq
     environment:
-      - QUEUE_RECV=cmt_pst_join_se_queue
+      - QUEUE_RECV=cmt_pst_join_queue
       - QUEUE_SEND=post_sentiments_queue
+      - WORKER_KEY=2
 
 
   posts_max_avg_sentiment:
@@ -237,8 +243,7 @@ services:
     environment:
       - QUEUE_RECV_COMMENTS=comments_filter_queue
       - QUEUE_RECV_POSTS=posts_for_join_queue
-      - QUEUE_SEND_STUDENTS=cmt_pst_join_st_queue
-      - QUEUE_SEND_SENTIMENTS=cmt_pst_join_se_queue
+      - QUEUE_SEND=cmt_pst_join_queue
       - CHUNKSIZE=400
       - RECV_WORKERS_COMMENTS=2
       - RECV_WORKERS_POSTS=3
