@@ -1,34 +1,14 @@
 import logging
-import signal
-import os
 
-from configparser import ConfigParser
 from join_comments_with_posts import JoinCommentsWithPosts
-from common.logs import initialize_log
-
-
-def initialize_config():
-    config = ConfigParser(os.environ)
-    config_params = {}
-    try:
-        config_params["QUEUE_RECV_COMMENTS"] = config["DEFAULT"]['QUEUE_RECV_COMMENTS']
-        config_params["QUEUE_RECV_POSTS"] = config["DEFAULT"]['QUEUE_RECV_POSTS']
-        config_params["QUEUE_SEND_STUDENTS"] = config["DEFAULT"]['QUEUE_SEND_STUDENTS']
-        config_params["QUEUE_SEND_SENTIMENTS"] = config["DEFAULT"]['QUEUE_SEND_SENTIMENTS']
-        config_params["CHUNKSIZE"] = int(config["DEFAULT"]['CHUNKSIZE'])
-        config_params["RECV_WORKERS_COMMENTS"] = int(config["DEFAULT"]['RECV_WORKERS_COMMENTS'])
-        config_params["RECV_WORKERS_POSTS"] = int(config["DEFAULT"]['RECV_WORKERS_POSTS'])
-        config_params["SEND_WORKERS"] = int(config["DEFAULT"]['SEND_WORKERS'])
-    except KeyError as e:
-        raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
-    except ValueError as e:
-        raise ValueError("Key could not be parsed. Error: {}. Aborting server".format(e))
-    return config_params
+from common.utils import initialize_log, initialize_config
 
 
 def main():
     try:
-        config_params = initialize_config()
+        config_params = initialize_config(["QUEUE_RECV_COMMENTS", "QUEUE_RECV_POSTS",
+            "QUEUE_SEND_STUDENTS", "QUEUE_SEND_SENTIMENTS", "CHUNKSIZE",
+            "RECV_WORKERS_COMMENTS", "RECV_WORKERS_POSTS", "SEND_WORKERS"])
         initialize_log()
 
         logging.info("Server configuration: {}".format(config_params))
