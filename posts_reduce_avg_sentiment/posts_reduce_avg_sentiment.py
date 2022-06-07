@@ -19,6 +19,7 @@ class PostsAvgSentiment:
 
         if "end" in posts:
             self.conn_send.send(json.dumps(posts))
+            self.conn_recv.close()
             return
 
         result = self.__parser(posts)
@@ -26,7 +27,6 @@ class PostsAvgSentiment:
 
     def start(self):
         self.conn_recv.recv(self.__callback)
-        self.exit_gracefully()
 
     def __parser(self, posts):
         list_posts = []

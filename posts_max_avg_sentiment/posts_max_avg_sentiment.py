@@ -20,7 +20,6 @@ class PostsMaxAvgSentiment:
 
     def start(self):
         self.conn_recv.recv(self.__callback)
-        self.exit_gracefully()
 
     def __callback(self, ch, method, properties, body):
         posts = json.loads(body)
@@ -29,6 +28,7 @@ class PostsMaxAvgSentiment:
             self.end_recv += 1
             if self.end_recv == self.recv_workers:
                 self.__end_recv(posts)
+                self.conn_recv.close()
             return
         else:
             self.__get_max_avg_sentiment(posts)

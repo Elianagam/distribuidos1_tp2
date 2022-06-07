@@ -29,6 +29,8 @@ class Client:
         self.comments_sender = Process(target=self.__send_comments())
         self.posts_sender = Process(target=self.__send_posts())
         self.sink_recver = Process(target=self.__recv_sinks())
+
+        self.count_end = 0
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):
@@ -56,7 +58,9 @@ class Client:
         sink_recv = json.loads(body)
         
         if "end" in sink_recv:
-            return
+            self.count_end += 1
+            if self.count_end == 3:
+                self.exit_gracefully()
         for student in sink_recv:
             logging.info(f"* * * [CLIENT RECV END STUDENT] {sink_recv}")
             self.students_recved.append(student)
@@ -65,7 +69,9 @@ class Client:
     def __callback(self, ch, method, properties, body):
         sink_recv = json.loads(body)
         if "end" in sink_recv:
-            return
+            self.count_end += 1
+            if self.count_end == 3:
+                self.exit_gracefully()
         else:
             logging.info(f"* * * [CLIENT RECV] {sink_recv.keys()}")
 

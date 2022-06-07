@@ -22,12 +22,12 @@ class PostsFilterScoreGteAvg:
     def start(self):
         self.conn_recv_avg.recv(self.__callback_avg, start_consuming=False)
         self.conn_recv_students.recv(self.__callback_students)
-        self.exit_gracefully()
 
     def __callback_students(self, ch, method, properties, body):
         posts = json.loads(body)
         if "end" in posts:
             self.conn_send.send(json.dumps(posts))
+            self.conn_recv_avg.close()
             return
 
         if self.avg_score != None:

@@ -24,6 +24,7 @@ class CommentsFilterStudent:
 
         if "end" in comments:
             self.conn_send.send(json.dumps(comments))
+            self.conn_recv.close()
             return
         else:
             result = self.__parser(comments)

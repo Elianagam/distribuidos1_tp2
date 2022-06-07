@@ -29,6 +29,7 @@ class CommentsFilterColumns:
         if "end" in comments:
             logging.info(f"[COMMENTS_RECV] END")
             self.conn_send.send(json.dumps(comments))
+            self.conn_recv.close()
             return
 
         logging.info(f"[COMMENT FILTER RECV] {len(comments)}")

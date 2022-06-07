@@ -21,7 +21,6 @@ class PostsFilterColumns:
 
     def start(self):
         self.conn_recv.recv(self.__callback)
-        self.exit_gracefully()
 
     def __callback(self, ch, method, properties, body):
         posts = json.loads(body)
@@ -30,6 +29,7 @@ class PostsFilterColumns:
             logging.info(f"[POSTS_RECV] END")
             self.conn_send_join.send(json.dumps(posts))
             self.conn_send_avg.send(json.dumps(posts))
+            self.conn_recv.close()
             return
 
         logging.info(f"[POST FILTER RECV] {self.worker_key} {len(posts)}")
