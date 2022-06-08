@@ -7,7 +7,7 @@ from common.utils import initialize_log, initialize_config
 def main():
     try:
         config_params = initialize_config(["QUEUE_RECV_COMMENTS", "QUEUE_RECV_POSTS",
-            "QUEUE_SEND_STUDENTS", "QUEUE_SEND_SENTIMENTS", "CHUNKSIZE",
+            "QUEUE_SEND", "CHUNKSIZE",
             "RECV_WORKERS_COMMENTS", "RECV_WORKERS_POSTS", "SEND_WORKERS"])
         initialize_log()
 
@@ -16,8 +16,7 @@ def main():
         recver = JoinCommentsWithPosts(
             queue_recv_comments=config_params["QUEUE_RECV_COMMENTS"],
             queue_recv_post=config_params["QUEUE_RECV_POSTS"],
-            queue_send_students=config_params["QUEUE_SEND_STUDENTS"],
-            queue_send_sentiments=config_params["QUEUE_SEND_SENTIMENTS"],
+            queue_send=config_params["QUEUE_SEND"],
             chunksize=int(config_params["CHUNKSIZE"]),
             recv_workers_comments=int(config_params["RECV_WORKERS_COMMENTS"]),
             recv_workers_posts=int(config_params["RECV_WORKERS_POSTS"]),
