@@ -12,9 +12,9 @@ def main():
         logging.info("Server configuration: {}".format(config_params))
 
         recver = CommentsFilterColumns(
-            config_params["QUEUE_RECV"],
-            config_params["QUEUE_SEND"],
-            int(config_params["WORKER_KEY"])
+            queue_recv=config_params["QUEUE_RECV"],
+            queue_send=config_params["QUEUE_SEND"],
+            worker_key=int(config_params["WORKER_KEY"])
         )
         recver.start()
     except Exception as e:

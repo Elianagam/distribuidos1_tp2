@@ -18,16 +18,16 @@ def main():
         except:
             pass
         client = Client(
-            config_params["COMMETS_QUEUE"],
-            config_params["POSTS_QUEUE"],
-            config_params["FILE_COMMETS"],
-            config_params["FILE_POSTS"],
-            int(config_params["CHUNKSIZE"]),
-            int(config_params["SEND_WORKERS_COMMENTS"]),
-            int(config_params["SEND_WORKERS_POSTS"]),
-            config_params["STUDENTS_QUEUE"],
-            config_params["AVG_QUEUE"],
-            config_params["IMAGE_QUEUE"],
+            comments_queue=config_params["COMMETS_QUEUE"],
+            posts_queue=config_params["POSTS_QUEUE"],
+            file_comments=config_params["FILE_COMMETS"],
+            file_posts=config_params["FILE_POSTS"],
+            chunksize=int(config_params["CHUNKSIZE"]),
+            send_workers_comments=int(config_params["SEND_WORKERS_COMMENTS"]),
+            send_workers_posts=int(config_params["SEND_WORKERS_POSTS"]),
+            students_queue=config_params["STUDENTS_QUEUE"],
+            avg_queue=config_params["AVG_QUEUE"],
+            image_queue=config_params["IMAGE_QUEUE"],
         )
         client.start()
     except Exception as e:

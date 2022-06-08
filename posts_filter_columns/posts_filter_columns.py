@@ -21,7 +21,6 @@ class PostsFilterColumns:
 
     def start(self):
         self.conn_recv.recv(self.__callback)
-        self.exit_gracefully()
 
     def __callback(self, ch, method, properties, body):
         posts = json.loads(body)

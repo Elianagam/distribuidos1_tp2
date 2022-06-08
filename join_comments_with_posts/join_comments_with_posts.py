@@ -30,7 +30,6 @@ class JoinCommentsWithPosts:
     def start(self):
         self.conn_recv_cmt.recv(self.__callback_recv_comments, start_consuming=False)
         self.conn_recv_pst.recv(self.__callback_recv_posts)
-        self.exit_gracefully()
 
     def __callback_recv_comments(self, ch, method, properties, body):
         comments = json.loads(body)

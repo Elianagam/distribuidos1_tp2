@@ -26,7 +26,6 @@ class PostsAvgSentiment:
 
     def start(self):
         self.conn_recv.recv(self.__callback)
-        self.exit_gracefully()
 
     def __parser(self, posts):
         list_posts = []

@@ -34,6 +34,8 @@ class Client:
     def exit_gracefully(self, *args):
         logging.info(f"CLOSE RECV CLIENT")
         self.conn_posts.close()
+        self.conn_comments.close()
+        self.conn_recv_students.close()
 
     def start(self):
         logging.info(f"[CLIENT] started...")
