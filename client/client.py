@@ -1,6 +1,5 @@
 import logging
 import signal
-import sys
 import csv
 import json
 from multiprocessing import Process
@@ -35,7 +34,6 @@ class Client:
         self.conn_posts.close()
         self.conn_comments.close()
         self.conn_recv_students.close()
-        sys.exit(0)
 
     def start(self):
         logging.info(f"[CLIENT] started...")
