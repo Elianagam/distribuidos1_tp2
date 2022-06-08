@@ -1,12 +1,11 @@
 import logging
 import signal
+import sys
 import csv
 import json
 from multiprocessing import Process
 from common.connection import Connection
 
-
-SINK_TO_RECV = 3
 
 class Client:
     def __init__(self, comments_queue, posts_queue, file_comments, 
@@ -36,6 +35,7 @@ class Client:
         self.conn_posts.close()
         self.conn_comments.close()
         self.conn_recv_students.close()
+        sys.exit(0)
 
     def start(self):
         logging.info(f"[CLIENT] started...")
@@ -114,4 +114,3 @@ class Client:
                 worker_key = self.__get_routing_key(count, send_workers)
                 logging.info(f"[READ CLIENT] {file_name} {len(chunk)} {worker_key}")
                 conn.send(body=json.dumps(chunk), routing_key=worker_key)
-        
