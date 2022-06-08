@@ -14,7 +14,7 @@ def main():
         recver = CommentsFilterStudent(
             config_params["QUEUE_RECV"],
             config_params["QUEUE_SEND"],
-            int(config_params["RECV_WORKERS"])
+            int(config_params["RECV_WORKERS"]),
             int(config_params["WORKER_KEY"])
         )
         recver.start()

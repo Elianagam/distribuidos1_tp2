@@ -59,11 +59,11 @@ class Client:
         sink_recv = json.loads(body)
         
         if "end" in sink_recv:
+            logging.info(f"* * * [CLIENT RECV END STUDENT] {len(self.students_recved)}")
+
             return
         for student in sink_recv:
-            logging.info(f"* * * [CLIENT RECV END STUDENT] {sink_recv}")
             self.students_recved.append(student)
-        
 
     def __callback(self, ch, method, properties, body):
         sink_recv = json.loads(body)
@@ -77,6 +77,7 @@ class Client:
                   "subreddit.nsfw", "created_utc", "permalink", 
                   "body", "sentiment", "score"]
 
+        logging.info(f"[COMMENTS START]")
         self.__read(self.file_comments, self.conn_comments, fields, self.send_workers_comments)
         self.__send_end(self.conn_comments, self.send_workers_comments)
 
@@ -85,6 +86,7 @@ class Client:
                   "subreddit.nsfw", "created_utc", "permalink", 
                   "domain", "url", "selftext", "title", "score"]
 
+        logging.info(f"[POSTS START]")
         self.__read(self.file_posts, self.conn_posts, fields, self.send_workers_posts)
         self.__send_end(self.conn_posts, self.send_workers_posts)
 
@@ -105,7 +107,7 @@ class Client:
             for i, line in enumerate(reader):
                 if (i % self.chunksize == 0 and i > 0):
                     worker_key = self.__get_routing_key(count, send_workers)
-                    logging.info(f"[READ CLIENT] {file_name} {len(chunk)} {worker_key}")
+                    #logging.info(f"[READ CLIENT] {file_name} {len(chunk)} {worker_key}")
                     conn.send(body=json.dumps(chunk), routing_key=worker_key)
                     chunk = []
                     count += 1

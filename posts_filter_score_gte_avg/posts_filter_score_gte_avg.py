@@ -54,7 +54,7 @@ class PostsFilterScoreGteAvg:
                 list_posts.append({"url": post["url"]})
 
         if len(list_posts) != 0:
-            logging.info(f"[STUDENT TO SEND] {list_posts}")
+            #logging.info(f"[STUDENT TO SEND] {list_posts}")
             self.conn_send.send(json.dumps(list_posts))
 
     def __send_arrive_early(self):
