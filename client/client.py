@@ -27,7 +27,6 @@ class Client:
         
         self.comments_sender = Process(target=self.__send_comments())
         self.posts_sender = Process(target=self.__send_posts())
-        #self.sink_recver = Process(target=self.__recv_sinks())
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):
@@ -43,13 +42,11 @@ class Client:
 
         self.posts_sender.run()
         self.comments_sender.run()
-        #self.sink_recver.run()
 
         self.__recv_sinks()
 
         self.comments_sender.join()
         self.posts_sender.join()
-        #self.sink_recver.join()
         self.exit_gracefully()
 
     def __recv_sinks(self):
@@ -84,15 +81,12 @@ class Client:
         self.__send_end(self.conn_comments, self.send_workers_comments)
 
     def __send_posts(self):
-        try:
-            fields = ["type", "id", "subreddit.id", "subreddit.name", 
-                      "subreddit.nsfw", "created_utc", "permalink", 
-                      "domain", "url", "selftext", "title", "score"]
+        fields = ["type", "id", "subreddit.id", "subreddit.name", 
+                  "subreddit.nsfw", "created_utc", "permalink", 
+                  "domain", "url", "selftext", "title", "score"]
 
-            self.__read(self.file_posts, self.conn_posts, fields, self.send_workers_posts)
-            self.__send_end(self.conn_posts, self.send_workers_posts)
-        except:
-            sys.exit(0)
+        self.__read(self.file_posts, self.conn_posts, fields, self.send_workers_posts)
+        self.__send_end(self.conn_posts, self.send_workers_posts)
 
     def __send_end(self, conn, send_workers):
         for i in range(send_workers):
