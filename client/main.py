@@ -1,3 +1,4 @@
+import sys
 import logging
 import os
 
@@ -31,6 +32,7 @@ def main():
         )
         client.start()
     except Exception as e:
+        sys.exit(0)
         logging.info(f"Close Connection")
 
 

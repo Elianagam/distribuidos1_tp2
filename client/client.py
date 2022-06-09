@@ -2,6 +2,7 @@ import logging
 import signal
 import csv
 import json
+import sys
 from multiprocessing import Process
 from common.connection import Connection
 
@@ -26,7 +27,7 @@ class Client:
         
         self.comments_sender = Process(target=self.__send_comments())
         self.posts_sender = Process(target=self.__send_posts())
-        self.sink_recver = Process(target=self.__recv_sinks())
+        #self.sink_recver = Process(target=self.__recv_sinks())
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, *args):
@@ -34,18 +35,23 @@ class Client:
         self.conn_posts.close()
         self.conn_comments.close()
         self.conn_recv_students.close()
+        sys.exit(0)
+
 
     def start(self):
         logging.info(f"[CLIENT] started...")
 
         self.posts_sender.run()
         self.comments_sender.run()
-        self.sink_recver.run()
+        #self.sink_recver.run()
+
+        self.__recv_sinks()
 
         self.comments_sender.join()
         self.posts_sender.join()
-        self.sink_recver.join()
-        
+        #self.sink_recver.join()
+        self.exit_gracefully()
+
     def __recv_sinks(self):
         self.conn_recv_students.recv(self.__callback_students, start_consuming=False)
         self.conn_recv_avg.recv(self.__callback, start_consuming=False)
@@ -78,12 +84,15 @@ class Client:
         self.__send_end(self.conn_comments, self.send_workers_comments)
 
     def __send_posts(self):
-        fields = ["type", "id", "subreddit.id", "subreddit.name", 
-                  "subreddit.nsfw", "created_utc", "permalink", 
-                  "domain", "url", "selftext", "title", "score"]
+        try:
+            fields = ["type", "id", "subreddit.id", "subreddit.name", 
+                      "subreddit.nsfw", "created_utc", "permalink", 
+                      "domain", "url", "selftext", "title", "score"]
 
-        self.__read(self.file_posts, self.conn_posts, fields, self.send_workers_posts)
-        self.__send_end(self.conn_posts, self.send_workers_posts)
+            self.__read(self.file_posts, self.conn_posts, fields, self.send_workers_posts)
+            self.__send_end(self.conn_posts, self.send_workers_posts)
+        except:
+            sys.exit(0)
 
     def __send_end(self, conn, send_workers):
         for i in range(send_workers):
